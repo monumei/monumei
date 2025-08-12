@@ -1,12 +1,12 @@
 # ✨ Hi! I'm YonMiru 🌀  
-### The codeless dev from with too many interests
+### The dev from within with too many interests
 ---
 
 ## 🧬 About Me
-- 🛠 Currently building a mysterious platform in **Tokyo** (you’ll hear about it soon... maybe).
-- 🎨 Learning everything from `Web Dev` to `AI`, `Clip Studio Paint`
-- 🕹 Otoge (音ゲー) gamer — otoge game is life.  
-- 🧠 Powered by matcha
+- 🛠 Currently building a solution platform in the **Philippines** (you’ll hear about it soon... maybe).
+- 🎨 Learning everything from `Web Development` `AI`, `Grahics Design`, `Art`
+- 🕹 Lowkey Otoge (音ゲー) gamer.
+- 🧠 Powered by matcha machiatto.
 ---
 
 ## 🌌 Tech & Tools
@@ -27,7 +27,7 @@
 ---
 
 ## 🛸 Random Lore™
-- 🎮 14k maimai player.
-- 🧪 Secretly builidng an art + tech studio.
+- 🎮 14.5k maimai player.
+- 🧪 Secretly builidng a startup art + tech studio.
 ---
 
