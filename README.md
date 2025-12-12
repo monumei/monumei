@@ -1,12 +1,12 @@
-# ✨ Hi! I'm YonMiru 🌀  
-### The dev from within with too many interests
+# ✨ Hi! I'm Monumei 🌀  
+### Your average programmer who loves designing and rhythm games
 ---
 
 ## 🧬 About Me
-- 🛠 Currently building a solution platform in the **Philippines** (you’ll hear about it soon... maybe).
-- 🎨 Learning everything from `Web Development` `AI`, `Grahics Design`, `Art`
-- 🕹 Lowkey Otoge (音ゲー) gamer.
-- 🧠 Powered by matcha machiatto.
+- 🛠 Currently working as Fullstack and Cloud Engineer
+- 🎨 Still learning from `Fullstack Web Development` `Google Cloud`, `Grahics Design`, `Lowkey Art`
+- 🧤 15k maimai player
+- 🍵 Powered by matcha latte and monster energy drink.
 ---
 
 ## 🌌 Tech & Tools
@@ -24,10 +24,5 @@
   <img src="https://github-readme-streak-stats.herokuapp.com?user=yonmiru&theme=tokyonight&hide_border=true" height="182" />
 </p>
 
----
-
-## 🛸 Random Lore™
-- 🎮 14.5k maimai player.
-- 🧪 Secretly builidng a startup art + tech studio.
 ---
 
