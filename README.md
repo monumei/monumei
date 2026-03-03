@@ -20,7 +20,6 @@
 
 ## 📊 Stats
 <p>
-  <img src="https://github-readme-stats.vercel.app/api?username=monumei&show_icons=true&theme=tokyonight&hide_title=true" height="182" />
   <img src="https://github-readme-streak-stats.herokuapp.com?user=monumei&theme=tokyonight&hide_border=true" height="182" />
 </p>
 
