@@ -3,8 +3,8 @@
 ---
 
 ## 🧬 About Me
-- 🛠 Currently working as Fullstack and Cloud Engineer
-- 🎨 Still learning from `Fullstack Web Development` `Google Cloud`, `Grahics Design`, `Lowkey Art`
+- 🛠 Currently working as Principal Software Engineer
+- 🎨 Still learning from `Fullstack Web Development` `Clound Engineering`, `Grahics Design`, `Lowkey Art`
 - 🧤 15k maimai player
 - 🍵 Powered by matcha latte and monster energy drink.
 ---
