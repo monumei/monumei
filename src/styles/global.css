@@ -48,10 +48,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Deliberately NO overflow-x here. Setting it makes <body> a scroll
-     container, which silently breaks every position:sticky descendant — the
-     pinned acts stop pinning. Horizontal overflow is handled by
-     `overflow-x: clip` on <html>, which does not create one. */
+  /* `clip`, never `hidden`: hidden would make <body> a scroll container and
+     silently break every position:sticky descendant, so the pinned acts would
+     stop pinning. `clip` creates no scroll container, so sticky keeps working
+     while nothing can drag the page sideways. Set on both <html> and <body>
+     because iOS Safari will still let the body pan when only the root clips. */
+  overflow-x: clip;
 }
 
 img,
@@ -527,7 +529,11 @@ main {
 
 .grain {
   position: fixed;
-  inset: -60px;
+  /* Exactly the viewport. It used to sit at inset:-60px and drift on a
+     transform, which put a fixed layer 60px past every edge — a reliable way
+     to give iOS Safari a phantom horizontal pan. The drift now moves the tiled
+     background instead of the element, so the box never leaves the screen. */
+  inset: 0;
   z-index: calc(var(--z-grain) + 1);
   pointer-events: none;
   /* No mix-blend-mode. Blending a fixed, full-viewport layer forces the
@@ -535,7 +541,6 @@ main {
      more than the grain is worth. Plain low opacity reads the same here
      because the ground is already near-black. */
   opacity: 0.055;
-  will-change: transform;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
   background-size: 180px 180px;
   image-rendering: pixelated;
@@ -549,16 +554,16 @@ main {
 
 @keyframes grain-drift {
   0% {
-    transform: translate3d(0, 0, 0);
+    background-position: 0 0;
   }
   25% {
-    transform: translate3d(-14px, 9px, 0);
+    background-position: -14px 9px;
   }
   50% {
-    transform: translate3d(11px, -12px, 0);
+    background-position: 11px -12px;
   }
   75% {
-    transform: translate3d(-8px, -6px, 0);
+    background-position: -8px -6px;
   }
 }
 
