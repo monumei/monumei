@@ -1,0 +1,302 @@
+---
+/**
+ * The artist card.
+ *
+ * Clicking a credit anywhere in the gallery opens this: who drew the piece,
+ * their handle, how many pieces of theirs hang here, and every place they can
+ * actually be found and hired. The point of the section is that the artists are
+ * named, so the credit is a real destination rather than a line of small print.
+ *
+ * Built in the chassis vocabulary — corner brackets, hazard rule, machined
+ * seams — rather than pulling in a component library: the tactical-HUD card
+ * idiom is already this site's own language.
+ *
+ * One dialog serves every credit on the page. It binds to any `[data-artist]`
+ * control, so tiles and the lightbox share it without either knowing about the
+ * other.
+ */
+---
+
+<dialog class="ac" id="artist-card" aria-labelledby="ac-name">
+  <div class="ac__hazard" aria-hidden="true"></div>
+
+  <form method="dialog" class="ac__close-form">
+    <button class="ac__close" value="close" aria-label="Close artist card">
+      <span aria-hidden="true">✕</span>
+    </button>
+  </form>
+
+  <div class="ac__body brackets">
+    <p class="ac__role stencil">Artist</p>
+
+    <h2 class="ac__name" id="ac-name"></h2>
+    <p class="ac__handle data" id="ac-handle" hidden></p>
+    <p class="ac__count data" id="ac-count"></p>
+
+    <ul class="ac__links" id="ac-links"></ul>
+
+    <p class="ac__none" id="ac-none" hidden>
+      No links on file for this artist yet.
+    </p>
+  </div>
+</dialog>
+
+<style>
+  .ac {
+    width: min(460px, 92vw);
+    max-width: none;
+    /* The reset's `* { margin: 0 }` also strips the UA's `margin: auto` on a
+       modal dialog, which is what centres it. Put it back. */
+    margin: auto;
+    padding: 0;
+    background: var(--chassis-1);
+    border: 1px solid var(--seam-strong);
+    box-shadow: var(--lift-3);
+    color: var(--ink-2);
+    overflow: hidden;
+  }
+
+  .ac::backdrop {
+    background: rgb(4 5 7 / 0.72);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ac[open] {
+      animation: ac-in var(--t-base) var(--ease-power);
+    }
+  }
+
+  @keyframes ac-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .ac__hazard {
+    height: 4px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--sig) 0 5px,
+      transparent 5px 12px
+    );
+    opacity: 0.22;
+  }
+
+  .ac__close-form {
+    position: absolute;
+    top: 4px;
+    right: 0;
+    z-index: 2;
+  }
+
+  .ac__close {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    font-size: 0.875rem;
+    color: var(--ink-3);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      background var(--t-fast) var(--ease-snap);
+  }
+
+  .ac__close:hover {
+    color: var(--void);
+    background: var(--sig);
+  }
+
+  .ac__body {
+    padding: var(--s6) var(--s5) var(--s5);
+  }
+
+  .ac__role {
+    color: var(--ink-4);
+  }
+
+  .ac__name {
+    margin-block-start: var(--s3);
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 600;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .ac__handle {
+    margin-block-start: var(--s2);
+    font-size: 0.875rem;
+    color: var(--sig);
+  }
+
+  .ac__handle[hidden] {
+    display: none;
+  }
+
+  .ac__count {
+    margin-block-start: var(--s2);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .ac__links {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-block-start: var(--s5);
+    list-style: none;
+    border-block-start: 1px solid var(--seam);
+  }
+
+  /* Rows rather than a row of chips: each destination gets its full name, so
+     "ArtStation" and "commissions open" read as different things. */
+  .ac__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding: var(--s4) var(--s2);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    border-block-end: 1px solid var(--seam);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      background var(--t-fast) var(--ease-snap),
+      padding-inline-start var(--t-base) var(--ease-power);
+  }
+
+  .ac__link:hover,
+  .ac__link:focus-visible {
+    color: var(--led-hot);
+    background: var(--chassis-2);
+    padding-inline-start: var(--s4);
+  }
+
+  .ac__link-go {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--ink-4);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      transform var(--t-base) var(--ease-power);
+  }
+
+  .ac__link:hover .ac__link-go {
+    color: var(--sig);
+    transform: translateX(4px);
+  }
+
+  .ac__none {
+    margin-block-start: var(--s5);
+    padding-block-start: var(--s4);
+    font-size: 0.9375rem;
+    color: var(--ink-4);
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .ac__none[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  type Artist = {
+    name: string;
+    handle?: string;
+    links: { label: string; href: string }[];
+    count: number;
+  };
+
+  const init = () => {
+    const dialog = document.getElementById('artist-card') as HTMLDialogElement | null;
+    if (!dialog) return;
+
+    // init runs at module evaluation and again on `astro:page-load`; the
+    // delegated document listener below must not stack up.
+    if (dialog.dataset.bound) return;
+    dialog.dataset.bound = '1';
+
+    const nameEl = document.getElementById('ac-name')!;
+    const handleEl = document.getElementById('ac-handle')!;
+    const countEl = document.getElementById('ac-count')!;
+    const linksEl = document.getElementById('ac-links')!;
+    const noneEl = document.getElementById('ac-none')!;
+
+    // Whatever opened the card gets focus back when it closes.
+    let opener: HTMLElement | null = null;
+
+    const open = (artist: Artist, from: HTMLElement) => {
+      opener = from;
+
+      nameEl.textContent = artist.name;
+
+      handleEl.textContent = artist.handle ?? '';
+      handleEl.hidden = !artist.handle;
+
+      countEl.textContent =
+        artist.count > 1
+          ? `${artist.count} pieces in this gallery`
+          : '1 piece in this gallery';
+
+      linksEl.replaceChildren();
+      for (const link of artist.links) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.className = 'ac__link';
+        a.href = link.href;
+        a.rel = 'noopener';
+        a.target = '_blank';
+
+        const label = document.createElement('span');
+        label.textContent = link.label;
+
+        const go = document.createElement('span');
+        go.className = 'ac__link-go';
+        go.textContent = '↗';
+        go.setAttribute('aria-hidden', 'true');
+
+        a.append(label, go);
+        li.append(a);
+        linksEl.append(li);
+      }
+
+      noneEl.hidden = artist.links.length > 0;
+
+      dialog.showModal();
+    };
+
+    // One listener for every credit on the page, including ones inside the
+    // lightbox — which is itself a dialog, so this card opens on top of it.
+    document.addEventListener('click', (e) => {
+      const trigger = (e.target as HTMLElement)?.closest<HTMLElement>('[data-artist]');
+      if (!trigger) return;
+
+      const raw = trigger.dataset.artist;
+      if (!raw) return;
+
+      let artist: Artist;
+      try {
+        artist = JSON.parse(raw) as Artist;
+      } catch {
+        return;
+      }
+      if (!artist.name) return;
+
+      e.preventDefault();
+      open(artist, trigger);
+    });
+
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => opener?.focus());
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

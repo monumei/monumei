@@ -1,0 +1,147 @@
+---
+import Base from '../../layouts/Base.astro';
+import ModulePlate from '../../components/ModulePlate.astro';
+import ArtPiece from '../../components/ArtPiece.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import ArtistCard from '../../components/ArtistCard.astro';
+import EmptyBay from '../../components/EmptyBay.astro';
+import { getArt, artistCounts, artistKey } from '../../lib/art';
+
+const all = await getArt();
+const counts = artistCounts(all);
+
+// Commissions lead, because that is what this gallery mostly is: the OC drawn
+// by the artists who were paid to draw them. Monumei's own pieces follow.
+// Mixing the two into one wall would quietly imply authorship of work that
+// isn't theirs.
+const commissions = all.filter((a) => a.data.commissioned);
+const own = all.filter((a) => !a.data.commissioned);
+
+const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
+---
+
+<Base
+  title="Art — Monumei"
+  description="Monumei's OC, drawn by commissioned artists — each piece credited to the artist who made it — plus Monumei's own work."
+  location="ART"
+>
+  <div class="page rail">
+    <ModulePlate
+      title="Art"
+      meta={all.length ? `${all.length} ${all.length === 1 ? 'piece' : 'pieces'}` : undefined}
+    />
+
+    {
+      all.length ? (
+        <>
+          <p class="page__lead">
+            Monumei, my OC. Most of what hangs here was drawn by artists I commissioned,
+            and every piece names the person who drew it. The rest I drew myself.
+          </p>
+
+          {commissions.length > 0 && (
+            <section class="sec" aria-labelledby="comm-h">
+              <div class="sec__head">
+                <h2 class="sec__h" id="comm-h">Commissioned</h2>
+                <span class="sec__n data">{commissions.length}</span>
+              </div>
+
+              <p class="sec__lead">
+                Drawn for me by other artists. Where I have their links, the credit opens
+                their card — several of them take commissions.
+              </p>
+
+              <div class="wall deck" data-stage="view">
+                {commissions.map((entry) => (
+                  <ArtPiece entry={entry} artistCount={countFor(entry.data.artist)} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {own.length > 0 && (
+            <section class="sec" aria-labelledby="own-h">
+              <div class="sec__head">
+                <h2 class="sec__h" id="own-h">Drawn by me</h2>
+                <span class="sec__n data">{own.length}</span>
+              </div>
+
+              <div class="wall deck" data-stage="view">
+                {own.map((entry) => (
+                  <ArtPiece entry={entry} artistCount={countFor(entry.data.artist)} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      ) : (
+        <EmptyBay
+          label="Gallery empty"
+          hint="No pieces yet. Add a markdown file per artwork with its image, and commissions get their artist credit printed automatically."
+          path="src/content/art/*.md"
+        />
+      )
+    }
+  </div>
+
+  <Lightbox />
+  <ArtistCard />
+</Base>
+
+<style>
+  /* The nav is fixed, so an index page has to open below it or its heading
+     plate lands underneath the bar. */
+  .page {
+    padding-block: clamp(118px, 15vh, 156px) var(--s8);
+  }
+
+  .page__lead {
+    max-width: var(--measure);
+    margin-block-end: var(--s7);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--ink-3);
+  }
+
+  .sec + .sec {
+    margin-block-start: var(--s9);
+  }
+
+  .sec__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding-block-end: var(--s3);
+    border-block-end: 1px solid var(--seam);
+  }
+
+  .sec__h {
+    font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+    font-weight: 600;
+  }
+
+  .sec__n {
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-4);
+  }
+
+  .sec__lead {
+    max-width: var(--measure);
+    margin-block-start: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  /* A real grid with one tile size, so the wall reads as a set regardless of
+     what each source file's resolution happens to be. Tiles crop to a shared
+     portrait ratio; the lightbox is where a piece is seen uncropped. */
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: var(--s5) var(--s4);
+    margin-block-start: var(--s5);
+  }
+</style>

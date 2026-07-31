@@ -1,0 +1,463 @@
+---
+import { Image } from 'astro:assets';
+import { artistPayload, type ArtEntry } from '../lib/art';
+
+/**
+ * The art rail.
+ *
+ * This replaced a full-bleed band that gave one image an entire viewport. A
+ * single picture at that scale is a takeover, not a section — and it could only
+ * ever show one piece, which is the wrong shape for a gallery that is mostly
+ * commissions of the same character by different artists.
+ *
+ * The rail travels sideways against vertical scroll, on the same `--p` every
+ * other stage uses. `ScrollEngine` measures the viewport's overflow into
+ * `--travel`, because CSS cannot work out "how much wider than its container"
+ * on its own; the track then reads both numbers and translates.
+ *
+ * Below 860px, without JS, and under reduced-motion it degrades to an ordinary
+ * swipeable rail with scroll snapping — a pinned horizontal carousel needs
+ * viewport height and a pointer it cannot assume it has.
+ */
+interface Props {
+  pieces: ArtEntry[];
+  counts: Map<string, number>;
+  /**
+   * Vertical scroll spent per pixel of horizontal travel. Below 1 the rail
+   * moves faster than the page; above 1 it drags.
+   */
+  pace?: number;
+}
+
+const { pieces, counts, pace = 0.9 } = Astro.props;
+
+const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()) ?? 1;
+---
+
+<section
+  class="arail"
+  id="art"
+  data-stage="pin"
+  data-loc="ART"
+  aria-labelledby="arail-h"
+  data-pace={pace}
+>
+  <div class="arail__frame">
+    <div class="arail__head">
+      <div class="arail__lede">
+        <h2 class="arail__h" id="arail-h">Art</h2>
+        <p class="arail__line">Monumei, drawn by the artists I commissioned.</p>
+      </div>
+
+      <a class="btn btn--ghost arail__all" href="/art/">
+        {pieces.length > 1 ? `All ${pieces.length} pieces` : 'See the gallery'}
+      </a>
+    </div>
+
+    <div class="arail__viewport" data-track>
+      <ul class="arail__track">
+        {
+          pieces.map((entry) => {
+            const d = entry.data;
+            const credited = !!d.artist;
+            const hasCard = credited && d.artistLinks.length > 0;
+            const label = d.artistHandle || d.artist || '';
+            return (
+              <li class="cell">
+                <a class="cell__link brackets" href="/art/">
+                  <Image
+                    src={d.image}
+                    alt={d.alt}
+                    widths={[420, 700, 1000]}
+                    sizes="(max-width: 860px) 72vw, 34vw"
+                    loading="lazy"
+                  />
+                  <span class="cell__rule" aria-hidden="true" />
+                </a>
+
+                <div class="cell__cap">
+                  <span class="cell__title">{d.title}</span>
+
+                  {credited &&
+                    (hasCard ? (
+                      <button
+                        class="cell__credit data"
+                        type="button"
+                        data-artist={artistPayload(d, countFor(d.artist))}
+                      >
+                        {label}
+                      </button>
+                    ) : (
+                      <span class="cell__credit cell__credit--flat data">{label}</span>
+                    ))}
+
+                  {d.creditPending && <span class="cell__pending data">Credit pending</span>}
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .arail {
+    --p: 0;
+    /* Content starts on the same line as every other section, then bleeds
+       past the right edge. */
+    --pad: max(var(--gutter), calc((100vw - var(--rail)) / 2));
+    --cell-h: clamp(260px, 50vh, 460px);
+    position: relative;
+    /* The pin lasts exactly as long as there is rail left to travel, measured
+       below. Until then it is a single viewport, so a rail with nothing to
+       scroll never reserves dead scroll height. */
+    height: calc(100svh + var(--budget, 0px));
+    background: var(--chassis-0);
+  }
+
+  /* Set when the pieces already fit: no travel, so no reason to pin. */
+  .arail[data-static] {
+    height: auto;
+  }
+
+  .arail[data-static] .arail__frame {
+    position: static;
+    height: auto;
+    padding-block: var(--s8);
+    overflow: visible;
+  }
+
+  .arail[data-static] .arail__track {
+    transform: none;
+  }
+
+  .arail__frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(24px, 4vh, 44px);
+    overflow: hidden;
+  }
+
+  .arail__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s5);
+    flex-wrap: wrap;
+    padding-inline: var(--pad);
+  }
+
+  .arail__h {
+    font-size: clamp(1.85rem, 4.4vw, 3.1rem);
+    font-weight: 600;
+  }
+
+  .arail__line {
+    max-width: 34ch;
+    margin-block-start: var(--s3);
+    font-size: clamp(0.95rem, 1.4vw, 1.0625rem);
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .arail__all {
+    flex: none;
+  }
+
+  .arail__viewport {
+    overflow: hidden;
+  }
+
+  .arail__track {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s4);
+    width: max-content;
+    padding: 0;
+    padding-inline: var(--pad);
+    margin: 0;
+    list-style: none;
+    /* --travel is written by ScrollEngine onto the viewport and inherits. */
+    transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
+    will-change: transform;
+  }
+
+  /* ── Cell ─────────────────────────────────────────────────────────────── */
+
+  .cell {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+  }
+
+  .cell__link {
+    --notch: var(--notch-m);
+    position: relative;
+    display: block;
+    height: var(--cell-h);
+    /* One card shape for the whole rail, matching the gallery grid. Sizing
+       each cell to its own aspect ratio made the strip ragged and meant the
+       travel distance changed with whatever happened to be in the collection. */
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--chassis-1);
+    border: 1px solid var(--seam);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--notch)) 0,
+      100% var(--notch),
+      100% 100%,
+      var(--notch) 100%,
+      0 calc(100% - var(--notch))
+    );
+    transition: border-color var(--t-base) var(--ease-snap);
+  }
+
+  .cell__link :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Faces survive the crop; feet do not. */
+    object-position: 50% 12%;
+    transition: transform var(--t-slow) var(--ease-power);
+  }
+
+  .cell__link:hover,
+  .cell__link:focus-visible {
+    border-color: rgb(46 123 255 / 0.5);
+  }
+
+  .cell__link:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .cell__link::before,
+  .cell__link::after {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity var(--t-base) var(--ease-snap);
+  }
+
+  .cell__link:hover::before,
+  .cell__link:hover::after,
+  .cell__link:focus-visible::before,
+  .cell__link:focus-visible::after {
+    opacity: 0.85;
+  }
+
+  .cell__rule {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--led), var(--led-hot));
+    box-shadow: var(--emit-led);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-slow) var(--ease-power);
+  }
+
+  .cell__link:hover .cell__rule,
+  .cell__link:focus-visible .cell__rule {
+    transform: scaleX(1);
+  }
+
+  .cell__cap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s2) var(--s3);
+    padding-block-start: var(--s3);
+    max-width: 42ch;
+  }
+
+  .cell__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--ink);
+  }
+
+  .cell__credit {
+    padding: 0;
+    font-size: 0.6875rem;
+    color: var(--sig);
+    border-bottom: 1px solid rgb(255 212 41 / 0.4);
+    transition: border-color var(--t-fast) var(--ease-snap);
+  }
+
+  .cell__credit:hover,
+  .cell__credit:focus-visible {
+    border-bottom-color: var(--sig);
+  }
+
+  /* Printed, not clickable — no links on file for this artist yet. */
+  .cell__credit--flat {
+    border-bottom: none;
+  }
+
+  .cell__pending {
+    font-size: 0.625rem;
+    color: var(--warn);
+    background: rgb(255 165 2 / 0.1);
+    border: 1px solid rgb(255 165 2 / 0.3);
+    padding: 2px 7px;
+  }
+
+  /* ── Fallback ─────────────────────────────────────────────────────────────
+     No pin, no transform — an ordinary rail the reader swipes. Used on narrow
+     screens, short windows, without JS, and under reduced-motion.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  @media (max-width: 860px), (max-height: 640px) {
+    .arail {
+      height: auto;
+    }
+
+    .arail__frame {
+      position: static;
+      height: auto;
+      padding-block: var(--s8);
+      overflow: visible;
+    }
+
+    .arail__viewport {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      padding-block-end: var(--s2);
+    }
+
+    .arail__viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .arail__track {
+      transform: none;
+    }
+
+    .cell {
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arail {
+      height: auto;
+    }
+
+    .arail__frame {
+      position: static;
+      height: auto;
+      padding-block: var(--s8);
+      overflow: visible;
+    }
+
+    .arail__viewport {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .arail__track {
+      transform: none;
+    }
+
+    .cell__link:hover :global(img) {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * The rail's pin length is a measurement, not a guess.
+   *
+   * A fixed budget is wrong in both directions: with two pieces it reserves a
+   * screenful of scroll during which nothing moves, and with twenty it whips
+   * past. So the section is one viewport tall until the overflow is known, then
+   * grows by exactly that overflow — which also keeps the horizontal speed
+   * constant however many pieces the gallery holds.
+   */
+  const init = () => {
+    const rails = [...document.querySelectorAll<HTMLElement>('.arail')];
+    if (!rails.length) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // These mirror the fallback media query in the stylesheet. Asking
+    // matchMedia rather than reading the frame's computed position matters:
+    // `[data-static]` makes that position static itself, so the test would
+    // latch on and the rail could never pin again after one narrow resize.
+    const fallback = window.matchMedia('(max-width: 860px), (max-height: 640px)');
+
+    const measure = () => {
+      const pinned = !reduce.matches && !fallback.matches;
+
+      for (const rail of rails) {
+        const viewport = rail.querySelector<HTMLElement>('.arail__viewport');
+        if (!viewport) continue;
+
+        const travel = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+
+        if (!pinned || travel < 8) {
+          rail.dataset.static = '';
+          rail.style.removeProperty('--budget');
+          continue;
+        }
+
+        delete rail.dataset.static;
+        const pace = Number(rail.dataset.pace) || 0.9;
+        rail.style.setProperty('--budget', `${Math.round(travel * pace)}px`);
+      }
+    };
+
+    measure();
+
+    // init runs at module evaluation and again on `astro:page-load`; measure()
+    // is idempotent but the listeners must not stack up.
+    if (!rails[0].dataset.bound) {
+      rails[0].dataset.bound = '1';
+      addEventListener('resize', measure, { passive: true });
+      reduce.addEventListener('change', measure);
+      fallback.addEventListener('change', measure);
+    }
+
+    // Cell widths come from each image's aspect ratio, so the real overflow is
+    // only known once the artwork and the caption font have loaded.
+    if (document.fonts?.ready) document.fonts.ready.then(measure);
+    for (const img of document.querySelectorAll('.arail img')) {
+      if (!(img as HTMLImageElement).complete) img.addEventListener('load', measure, { once: true });
+    }
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style is:global>
+  /* Without JS nothing writes --travel, so the track would sit at its start
+     with the rest of the pieces unreachable. Fall back to a scrollable rail. */
+  html:not(.js) .arail {
+    height: auto;
+  }
+
+  html:not(.js) .arail__frame {
+    position: static;
+    height: auto;
+    padding-block: var(--s8);
+    overflow: visible;
+  }
+
+  html:not(.js) .arail__viewport {
+    overflow-x: auto;
+  }
+
+  html:not(.js) .arail__track {
+    transform: none;
+  }
+</style>

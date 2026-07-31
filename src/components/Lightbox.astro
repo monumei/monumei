@@ -1,0 +1,373 @@
+---
+/**
+ * The gallery's viewer.
+ *
+ * A native <dialog>, not a hand-rolled overlay: it gets the top layer, focus
+ * trapping, Escape-to-close, and inert background for free, which is most of
+ * what a lightbox library is actually selling.
+ *
+ * Every tile is a working link to the image file before this script runs. The
+ * script upgrades that click to the dialog; it never creates the only way in.
+ */
+---
+
+<dialog class="lb" id="lightbox" aria-label="Artwork viewer">
+  <form method="dialog" class="lb__close-form">
+    <button class="lb__close" value="close" aria-label="Close viewer">
+      <span aria-hidden="true">✕</span>
+    </button>
+  </form>
+
+  <figure class="lb__figure">
+    {/* Starts on a transparent pixel rather than an empty src. The viewer is
+        always populated before it opens, but an image element with no source is
+        a broken-image box the moment that ordering is ever wrong. */}
+    <img class="lb__img" id="lb-img" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+
+    <figcaption class="lb__cap">
+      <h2 class="lb__title" id="lb-title"></h2>
+      <p class="lb__note" id="lb-note" hidden></p>
+      <p class="lb__meta data">
+        <span id="lb-medium"></span>
+        <button class="lb__credit" id="lb-credit" type="button" hidden></button>
+        <span class="lb__pending" id="lb-pending" hidden>Credit pending</span>
+        <span class="lb__date" id="lb-date"></span>
+      </p>
+    </figcaption>
+  </figure>
+
+  <nav class="lb__step" aria-label="Artwork navigation">
+    <button class="lb__arrow" id="lb-prev" type="button" aria-label="Previous piece">←</button>
+    <span class="lb__count data" id="lb-count" aria-live="polite"></span>
+    <button class="lb__arrow" id="lb-next" type="button" aria-label="Next piece">→</button>
+  </nav>
+</dialog>
+
+<style>
+  /* No `position` here. A modal dialog is centred by the UA against the
+     viewport, and overriding its position drops it back into normal document
+     flow — which puts it wherever the page happens to be scrolled to. The
+     absolutely-positioned close button still resolves against it, because the
+     UA's own positioning makes the dialog a containing block. */
+  .lb {
+    width: min(1180px, 94vw);
+    max-width: none;
+    /* The reset's `* { margin: 0 }` also strips the UA's `margin: auto` on a
+       modal dialog, which is what centres it. Put it back. */
+    margin: auto;
+    padding: 0;
+    background: var(--chassis-1);
+    border: 1px solid var(--seam-strong);
+    color: var(--ink-2);
+    overflow: hidden;
+  }
+
+  /* A definite height, then a column that distributes it: the artwork takes
+     whatever is left after the step bar instead of the three parts summing
+     past the window. A fixed frame also means stepping between pieces of
+     different proportions doesn't resize the dialog under the pointer.
+     `display` is set only on [open] — a dialog with a display value while
+     closed is a visible dialog. */
+  .lb[open] {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+  }
+
+  .lb::backdrop {
+    background: rgb(4 5 7 / 0.86);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lb[open] {
+      animation: lb-in var(--t-base) var(--ease-power);
+    }
+  }
+
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+  }
+
+  .lb__close-form {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+  }
+
+  .lb__close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    background: rgb(8 9 11 / 0.72);
+    border-inline-start: 1px solid var(--seam);
+    border-block-end: 1px solid var(--seam);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      background var(--t-fast) var(--ease-snap);
+  }
+
+  .lb__close:hover {
+    color: var(--void);
+    background: var(--sig);
+  }
+
+  .lb__figure {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 290px);
+    align-items: stretch;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .lb__img {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+    background: var(--chassis-0);
+  }
+
+  .lb__cap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    min-height: 0;
+    /* Clears the close button, which sits in this column's top corner. */
+    padding: 56px var(--s5) var(--s6);
+    border-inline-start: 1px solid var(--seam);
+    overflow-y: auto;
+  }
+
+  .lb__title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .lb__note {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .lb__note[hidden] {
+    display: none;
+  }
+
+  .lb__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    margin-block-start: auto;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+  }
+
+  #lb-medium {
+    color: var(--ink-3);
+  }
+
+  .lb__credit {
+    align-self: flex-start;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    color: var(--sig);
+    border-bottom: 1px solid rgb(255 212 41 / 0.4);
+    transition: border-color var(--t-fast) var(--ease-snap);
+  }
+
+  .lb__credit[hidden] {
+    display: none;
+  }
+
+  .lb__credit:hover,
+  .lb__credit:focus-visible {
+    border-bottom-color: var(--sig);
+  }
+
+  .lb__pending {
+    align-self: flex-start;
+    color: var(--warn);
+    background: rgb(255 165 2 / 0.1);
+    border: 1px solid rgb(255 165 2 / 0.3);
+    padding: 2px 7px;
+  }
+
+  .lb__pending[hidden] {
+    display: none;
+  }
+
+  .lb__date {
+    color: var(--ink-4);
+  }
+
+  .lb__date[hidden] {
+    display: none;
+  }
+
+  .lb__step {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding: var(--s3) var(--s5);
+    border-block-start: 1px solid var(--seam);
+    background: var(--chassis-0);
+  }
+
+  .lb__arrow {
+    padding: 6px 16px;
+    font-family: var(--font-data);
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    background: var(--chassis-2);
+    border: 1px solid var(--seam);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      border-color var(--t-fast) var(--ease-snap);
+  }
+
+  .lb__arrow:hover:not(:disabled) {
+    color: var(--sig);
+    border-color: var(--sig);
+  }
+
+  .lb__arrow:disabled {
+    color: var(--ink-4);
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .lb__count {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    color: var(--ink-4);
+  }
+
+  @media (max-width: 860px) {
+    .lb__figure {
+      grid-template-columns: minmax(0, 1fr);
+      /* The artwork takes the room that is left; the caption keeps its own
+         height and scrolls if the note is long. */
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .lb__cap {
+      max-height: 42vh;
+      border-inline-start: none;
+      border-block-start: 1px solid var(--seam);
+      padding: var(--s5) var(--s4);
+    }
+  }
+</style>
+
+<script>
+  const init = () => {
+    const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+    const tiles = [...document.querySelectorAll<HTMLAnchorElement>('[data-piece]')];
+    if (!dialog || !tiles.length) return;
+
+    // init runs at module evaluation and again on `astro:page-load`.
+    if (dialog.dataset.bound) return;
+    dialog.dataset.bound = '1';
+
+    const img = document.getElementById('lb-img') as HTMLImageElement;
+    const title = document.getElementById('lb-title')!;
+    const note = document.getElementById('lb-note')!;
+    const medium = document.getElementById('lb-medium')!;
+    const credit = document.getElementById('lb-credit') as HTMLButtonElement;
+    const pending = document.getElementById('lb-pending')!;
+    const date = document.getElementById('lb-date')!;
+    const count = document.getElementById('lb-count')!;
+    const prev = document.getElementById('lb-prev') as HTMLButtonElement;
+    const next = document.getElementById('lb-next') as HTMLButtonElement;
+
+    let index = 0;
+
+    const show = (i: number) => {
+      const tile = tiles[i];
+      if (!tile) return;
+      index = i;
+
+      const d = tile.dataset;
+      img.src = d.full ?? '';
+      img.alt = d.alt ?? '';
+      title.textContent = d.title ?? '';
+
+      note.textContent = d.note ?? '';
+      note.hidden = !d.note;
+
+      medium.textContent = d.medium ?? '';
+
+      // Pieces without a known date simply don't print one.
+      date.textContent = d.date ?? '';
+      date.hidden = !d.date;
+
+      // The credit opens the artist's card, which is bound globally to
+      // [data-artist] — so this control needs the payload and nothing else.
+      if (d.artistLabel && d.artistPayload) {
+        credit.textContent = d.artistLabel;
+        credit.dataset.artist = d.artistPayload;
+        credit.hidden = false;
+      } else {
+        credit.hidden = true;
+        delete credit.dataset.artist;
+      }
+
+      pending.hidden = d.creditPending !== 'true';
+
+      count.textContent = `${i + 1} / ${tiles.length}`;
+      prev.disabled = i === 0;
+      next.disabled = i === tiles.length - 1;
+    };
+
+    const step = (delta: number) => {
+      const target = index + delta;
+      if (target >= 0 && target < tiles.length) show(target);
+    };
+
+    tiles.forEach((tile, i) => {
+      tile.addEventListener('click', (e) => {
+        // Leave modified clicks alone so "open in new tab" still works.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        show(i);
+        dialog.showModal();
+      });
+    });
+
+    prev.addEventListener('click', () => step(-1));
+    next.addEventListener('click', () => step(1));
+
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+
+    // Clicking the backdrop closes. The dialog element itself is the click
+    // target only when the pointer lands outside its content box.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    // Returning focus to the tile that opened the viewer keeps keyboard
+    // position after Escape.
+    dialog.addEventListener('close', () => tiles[index]?.focus());
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
