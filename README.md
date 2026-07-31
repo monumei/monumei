@@ -29,12 +29,10 @@
 
 ## 🎶 Now Playing
 
-[![spotify-github-profile](https://spotify-github-profile.kittinanx.com/api/view?uid=o8930qm21yhjrgc1u6sk8jz54&cover_image=true&theme=natemoo-re&show_offline=true&background_color=121212&interchange=false&bar_color=53b14f&bar_color_cover=false)](https://open.spotify.com/user/o8930qm21yhjrgc1u6sk8jz54)
+[![spotify-github-profile](https://spotify-github-profile.kittinanx.com/api/view?uid=o8930qm21yhjrgc1u6sk8jz54&cover_image=true&theme=novatorem&show_offline=true&background_color=121212&interchange=false&profanity=false&hide_remaster=false&bar_color=3654b0&bar_color_cover=false)](https://spotify-github-profile.kittinanx.com/api/view?uid=o8930qm21yhjrgc1u6sk8jz54&redirect=true)
 
 ---
 
 ## 📊 Stats
 
-<p>
-  <img src="https://github-readme-streak-stats.herokuapp.com?user=monumei&theme=tokyonight&hide_border=true" height="182" />
-</p>
+[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=monumei&theme=meta-dark&hide_border=true)](https://git.io/streak-stats)
