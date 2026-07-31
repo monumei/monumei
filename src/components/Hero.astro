@@ -1,0 +1,562 @@
+---
+import { Image } from 'astro:assets';
+import Rain from './Rain.astro';
+import hero from '../assets/hero.png';
+
+// The spec plate is gone. Every cell it held was said better somewhere else on
+// the same screen — the role by the heading, the focus by the blurb verbatim —
+// and the personal trivia it used to carry (maimai counts, what's in the mug)
+// now lives in the shell under `funfacts`. What is left is a headline, a
+// sentence, and two buttons.
+
+// Deterministic city bokeh — distant windows, thrown well out of focus.
+let s = 0x2545f491;
+const rand = () => {
+  s ^= s << 13;
+  s >>>= 0;
+  s ^= s >>> 17;
+  s ^= s << 5;
+  s >>>= 0;
+  return (s % 100000) / 100000;
+};
+
+const bokeh = Array.from({ length: 46 }, () => ({
+  x: +(rand() * 1000).toFixed(1),
+  y: +(rand() * 460).toFixed(1),
+  r: +(2 + rand() * 9).toFixed(1),
+  o: +(0.05 + rand() * 0.26).toFixed(2),
+  warm: rand() > 0.6,
+}));
+---
+
+<!--
+  Key art, built as a pinned stage.
+
+  Layer order is the whole idea: sky, far rain, WORDMARK, character, near rain.
+  The name sits behind the figure and is partly occluded by them — the way a
+  game splash treats its logo — so the two read as one composed image rather
+  than a title with a picture next to it. Every layer moves at its own rate
+  against `--p`, so scrolling separates them into depth.
+-->
+<section class="hero" data-stage="pin" aria-labelledby="hero-title">
+  <div class="hero__frame">
+    <div class="scene" aria-hidden="true">
+      <div class="scene__sky l-sky"></div>
+
+      <svg class="scene__bokeh l-sky" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="bokeh-cool">
+            <stop offset="0%" stop-color="#8cbaff" stop-opacity="0.85" />
+            <stop offset="45%" stop-color="#8cbaff" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#8cbaff" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="bokeh-warm">
+            <stop offset="0%" stop-color="#ffd429" stop-opacity="0.8" />
+            <stop offset="45%" stop-color="#ffd429" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="#ffd429" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        {
+          bokeh.map((b) => (
+            <circle
+              cx={b.x}
+              cy={b.y}
+              r={b.r * 2.6}
+              fill={b.warm ? 'url(#bokeh-warm)' : 'url(#bokeh-cool)'}
+              opacity={b.o * 1.6}
+            />
+          ))
+        }
+      </svg>
+
+      <div class="scene__rain l-far"><Rain depth="far" /></div>
+      <div class="scene__rain l-mid"><Rain depth="mid" /></div>
+    </div>
+
+    <!-- The name, behind the figure -->
+    <div class="word l-word" aria-hidden="true">
+      <span class="word__text">MONU<span class="word__lit">MEI</span></span>
+    </div>
+
+    <!--
+      Scrim for the copy. It sits here — full-bleed, and *behind* the figure —
+      rather than on .hero__ui, which is a .rail and so clipped the gradient to
+      1360px: its right edge cut a visible vertical seam straight across the
+      artwork. Behind the figure it also stops dimming the character it is
+      supposed to be sitting under.
+    -->
+    <div class="hero__scrim l-scrim" aria-hidden="true"></div>
+
+    <!-- The figure, in front of the name -->
+    <div class="figure l-figure">
+      <Image
+        src={hero}
+        alt=""
+        widths={[520, 780, 1100]}
+        sizes="(max-width: 720px) 92vw, (max-width: 1180px) 60vw, 46vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+
+    <div class="scene scene--front" aria-hidden="true">
+      <div class="scene__rain l-near"><Rain depth="near" /></div>
+      <div class="scene__haze"></div>
+      <div class="scene__film"></div>
+    </div>
+
+    <!-- Copy sits on the chassis, over the scene -->
+    <div class="hero__ui rail">
+      <h1 class="sr-only" id="hero-title">Monumei — lowkey software engineer</h1>
+
+      <div class="hero__copy l-copy">
+        <p class="hero__role">
+          <span class="hero__role-main">Lowkey software engineer</span>
+        </p>
+
+        <p class="hero__blurb">
+          I build web things and design the pixels around them. Fullstack, cloud, and
+          whatever the current obsession is.
+        </p>
+
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#log">Read the log</a>
+          <a class="btn btn--ghost" href="https://github.com/monumei" rel="me noopener">GitHub</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="hero__cue" aria-hidden="true">
+      <span class="hero__cue-label data">Scroll</span>
+      <span class="hero__cue-rail"><span class="hero__cue-bead"></span></span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --p: 0;
+    position: relative;
+    height: 250vh;
+    /* The scene layers are absolutely positioned against this element, so on
+       viewports where the frame is not the containing block they would
+       otherwise escape the frame's own clipping. */
+    overflow: clip;
+  }
+
+  .hero__frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    background: #05070e;
+    isolation: isolate;
+  }
+
+  /* ── Scene layers ─────────────────────────────────────────────────────── */
+
+  .scene,
+  .scene--front {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .scene--front {
+    z-index: 4;
+  }
+
+  .scene__sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(58% 42% at 62% 12%, rgb(46 123 255 / 0.34), transparent 72%),
+      radial-gradient(46% 34% at 16% 68%, rgb(112 84 200 / 0.2), transparent 76%),
+      linear-gradient(180deg, #0c1730 0%, #080e1e 46%, #05070e 100%);
+  }
+
+  /* The blur that used to soften these lived on a layer that moves with
+     scroll, so it re-rasterised constantly. The circles now carry their own
+     falloff via a gradient fill instead — same look, no filter. */
+  .scene__bokeh {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 62%;
+    opacity: 0.85;
+  }
+
+  .scene__rain {
+    position: absolute;
+    inset: 0;
+  }
+
+  .scene__haze {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 42%;
+    background: linear-gradient(180deg, transparent, rgb(46 123 255 / 0.08) 46%, rgb(5 7 14 / 0.94));
+  }
+
+  .scene__film {
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 3px, rgb(255 255 255 / 0.013) 3px 4px),
+      radial-gradient(120% 92% at 50% 44%, transparent 52%, rgb(0 0 0 / 0.72) 100%);
+  }
+
+  /* ── Wordmark: behind the figure ──────────────────────────────────────── */
+
+  /* Lifted clear of the copy block below. The figure crosses the middle of
+     the name, which is the point — but the type must not collide with the
+     sentence a visitor actually has to read. */
+  /* Type left, figure right. The name runs from the same rail the copy below
+     it sits on, and the figure crosses its tail — occluding the end of a
+     wordmark is the key-art move; colliding with body copy is not. */
+  .word {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-inline-start: var(--gutter);
+    padding-block-end: 22vh;
+  }
+
+  .word__text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(4.4rem, 17vw, 15rem);
+    line-height: 0.82;
+    letter-spacing: -0.05em;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .word__lit {
+    color: var(--led);
+    text-shadow: 0 0 60px rgb(46 123 255 / 0.75);
+  }
+
+  /* ── Figure: in front of the wordmark ─────────────────────────────────── */
+
+  /* The source art is cropped hard at its right and bottom edges. Rather
+     than showing those cuts, the figure is bled past both: the umbrella's
+     sliced edge leaves the frame on the right, and the cropped legs leave it
+     at the bottom. A soft mask on the trailing edge catches whatever the
+     bleed doesn't, so no straight cut is ever visible against the sky. */
+  .figure {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .figure :global(img) {
+    width: auto;
+    height: 106%;
+    max-width: none;
+    margin-inline-end: -9%;
+    margin-block-end: -4%;
+    object-fit: contain;
+    object-position: bottom right;
+    /* drop-shadow removed: paired with the scroll-driven scale it forced the
+       whole image to re-rasterise every frame. The scene's haze already
+       seats the figure against the background. */
+    -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent 99%);
+    mask-image: linear-gradient(90deg, #000 78%, transparent 99%);
+  }
+
+  /* ── UI ───────────────────────────────────────────────────────────────── */
+
+  /* The block is bottom-anchored, so its bottom padding is what sets how high
+     it sits. Losing the spec plate dropped the copy onto the floor of the
+     viewport; this lifts it back into the frame, clear of the scroll cue. */
+  .hero__ui {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 4vh, 40px);
+    padding-block: clamp(60px, 12vh, 130px) clamp(80px, 17vh, 190px);
+  }
+
+  /* Scrim: the copy has to stay readable wherever the art happens to be bright
+     behind it, without dimming the whole scene — and without announcing itself
+     as a box. Full-bleed, tall, and with enough stops that no single edge in
+     the ramp is visible. z-index 2 puts it above the wordmark and below the
+     figure (3), so the character is never dimmed by it. */
+  .hero__scrim {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 78%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(5 7 14 / 0) 0%,
+      rgb(5 7 14 / 0.06) 22%,
+      rgb(5 7 14 / 0.22) 40%,
+      rgb(5 7 14 / 0.48) 56%,
+      rgb(5 7 14 / 0.72) 72%,
+      rgb(5 7 14 / 0.9) 100%
+    );
+  }
+
+  .hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4);
+    max-width: 46ch;
+  }
+
+  .hero__role {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--s3) var(--s4);
+    margin: 0;
+  }
+
+  .hero__role-main {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .hero__blurb {
+    font-size: 1.0625rem;
+    line-height: 1.68;
+    color: var(--ink-2);
+    text-shadow: 0 1px 12px rgb(5 7 14 / 0.9);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    margin-block-start: var(--s2);
+  }
+
+  /* ── Scroll cue ───────────────────────────────────────────────────────── */
+
+  .hero__cue {
+    position: absolute;
+    right: var(--gutter);
+    bottom: clamp(24px, 5vh, 52px);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    /* Holds while the first beat is pure art — it is the only instruction on
+       screen — then leaves as soon as the copy it points to has arrived. */
+    opacity: calc(1 - clamp(0, calc((var(--p) - 0.1) * 7), 1));
+  }
+
+  .hero__cue-label {
+    font-size: 0.5625rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .hero__cue-rail {
+    position: relative;
+    width: 46px;
+    height: 1px;
+    background: var(--chassis-4);
+    overflow: hidden;
+  }
+
+  .hero__cue-bead {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 14px;
+    background: var(--sig);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__cue-bead {
+      animation: cue-run 2.6s var(--ease-power) infinite;
+    }
+  }
+
+  @keyframes cue-run {
+    0% {
+      transform: translateX(-100%);
+    }
+    60%,
+    100% {
+      transform: translateX(330%);
+    }
+  }
+
+  /* ═══ PARALLAX ══════════════════════════════════════════════════════════
+     Each layer's own rate. Far things barely move and the near ones travel
+     hard, which is the entire reason the scene reads as having depth.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  .l-sky {
+    transform: translate3d(0, calc(var(--p) * 5vh), 0) scale(calc(1 + var(--p) * 0.06));
+  }
+
+  .l-far {
+    transform: translate3d(0, calc(var(--p) * -4vh), 0);
+  }
+
+  .l-mid {
+    transform: translate3d(0, calc(var(--p) * -9vh), 0);
+  }
+
+  .l-near {
+    opacity: calc(0.55 + var(--p) * 0.45);
+    transform: translate3d(0, calc(var(--p) * -20vh), 0) scale(calc(1 + var(--p) * 0.14));
+  }
+
+  /* ── The hero's beats ───────────────────────────────────────────────────
+     0.00 → 0.16   key art alone: the figure and the name, nothing else.
+     0.16 → 0.40   the role and the sentence arrive.
+     0.50 → 1.00   the whole scene recedes, back to front, into the next act.
+     Art holds longest because it is the thing worth looking at; the copy
+     leaves first because it has already been read.
+     ─────────────────────────────────────────────────────────────────────── */
+
+  /* No animated blur. Re-blurring display-size type on every frame was one
+     of the most expensive things on the page, and opacity plus scale reads
+     as the same recession for a fraction of the cost. */
+  .l-word {
+    --e: clamp(0, calc((var(--p) - 0.5) * 2.4), 1);
+    opacity: calc(1 - var(--e));
+    transform: translate3d(0, calc(var(--e) * -14vh), 0) scale(calc(1 - var(--e) * 0.1));
+    will-change: transform, opacity;
+  }
+
+  .l-figure {
+    --e: clamp(0, calc((var(--p) - 0.62) * 2.8), 1);
+    opacity: calc(1 - var(--e));
+    transform: translate3d(0, calc(var(--e) * -7vh), 0) scale(calc(1 + var(--p) * 0.14));
+    will-change: transform, opacity;
+  }
+
+  .l-copy {
+    --r: clamp(0, calc((var(--p) - 0.16) * 4.4), 1);
+    --e: clamp(0, calc((var(--p) - 0.7) * 3.6), 1);
+    opacity: calc(var(--r) - var(--e));
+    transform: translate3d(0, calc((1 - var(--r)) * 44px - var(--e) * 6vh), 0);
+  }
+
+
+  /* The scrim only earns its keep once there is copy to protect. */
+  .l-scrim {
+    opacity: clamp(0, calc((var(--p) - 0.12) * 5), 1);
+  }
+
+  /* ── Boot ─────────────────────────────────────────────────────────────── */
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .word__text {
+      animation: word-resolve 1.1s var(--ease-seat) 120ms backwards;
+    }
+
+    :global(.js) .figure :global(img) {
+      animation: figure-arrive 1.3s var(--ease-seat) 220ms backwards;
+    }
+
+  }
+
+  /* No blur here either: a 24px blur across display-size type is a very
+     expensive first second. Opening wide and settling in reads as the same
+     "resolving" gesture and costs nothing. */
+  @keyframes word-resolve {
+    from {
+      opacity: 0;
+      letter-spacing: 0.08em;
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes figure-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(5%) scale(1.04);
+    }
+  }
+
+
+  /* ── Responsive ───────────────────────────────────────────────────────── */
+
+  @media (max-width: 1180px) {
+    .figure :global(img) {
+      height: 82%;
+    }
+
+    .word {
+      align-items: flex-start;
+      padding-block-start: 16vh;
+    }
+  }
+
+  @media (max-width: 860px) {
+
+    .hero__cue {
+      display: none;
+    }
+  }
+
+  /* On a phone the pinned camera runs out of room, so the hero becomes an
+     ordinary tall section with the scene still intact. */
+  @media (max-width: 720px) {
+    .hero {
+      height: auto;
+    }
+
+    .hero__frame {
+      position: static;
+      height: auto;
+      min-height: 100svh;
+    }
+
+    .hero__ui {
+      position: relative;
+      padding-block: 62vh var(--s6);
+    }
+
+    .figure :global(img) {
+      height: 62vh;
+    }
+
+    .figure {
+      align-items: flex-start;
+      padding-block-start: 88px;
+    }
+
+    .word {
+      align-items: flex-start;
+      padding-block-start: 20vh;
+    }
+
+    .l-sky,
+    .l-far,
+    .l-mid,
+    .l-near,
+    .l-word,
+    .l-figure,
+    .l-copy {
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+
+  }
+</style>

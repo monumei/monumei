@@ -1,0 +1,71 @@
+---
+/**
+ * An empty rack bay. Not an apology — a labelled slot with the install
+ * instruction printed on it, which is what real hardware does.
+ */
+interface Props {
+  label: string;
+  hint: string;
+  path: string;
+}
+const { label, hint, path } = Astro.props;
+---
+
+<div class="bay panel panel--deep notch-m">
+  <div class="bay__tape" aria-hidden="true"></div>
+  <div class="bay__body">
+    <p class="bay__label stencil">{label}</p>
+    <p class="bay__hint">{hint}</p>
+    <p class="bay__path data">{path}</p>
+  </div>
+  <div class="bay__tape" aria-hidden="true"></div>
+</div>
+
+<style>
+  .bay {
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+
+  .bay__tape {
+    height: 6px;
+    flex: none;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--sig) 0 6px,
+      transparent 6px 14px
+    );
+    opacity: 0.24;
+  }
+
+  .bay__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s3);
+    padding: var(--s6) var(--s5);
+    text-align: center;
+  }
+
+  .bay__label {
+    color: var(--ink-3);
+  }
+
+  .bay__hint {
+    max-width: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .bay__path {
+    font-size: 0.75rem;
+    color: var(--sig);
+    background: var(--sig-wash);
+    border: 1px solid rgb(255 212 41 / 0.24);
+    padding: 5px 11px;
+  }
+</style>
