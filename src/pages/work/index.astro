@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ModulePlate from '../../components/ModulePlate.astro';
+import WorkUnit from '../../components/WorkUnit.astro';
+import EmptyBay from '../../components/EmptyBay.astro';
+
+const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.unit - b.data.unit
+);
+---
+
+<Base
+  title="Selected Work — Monumei"
+  description="Projects by Monumei across fullstack web, cloud infrastructure, and interface design."
+  location="WORK"
+>
+  <div class="page rail">
+    <ModulePlate
+      title="Selected Work"
+      meta={units.length ? `${units.length} ${units.length === 1 ? 'project' : 'projects'}` : undefined}
+    />
+
+    {
+      units.length ? (
+        <div class="deck page__grid" data-stage="view">
+          {units.map((u) => (
+            <WorkUnit
+              href={`/work/${u.id}/`}
+              unit={u.data.unit}
+              title={u.data.title}
+              summary={u.data.summary}
+              tech={u.data.tech}
+              status={u.data.status}
+              stack={u.data.stack}
+              sample={u.data.sample}
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyBay
+          label="No modules installed"
+          hint="The rack is empty. Add a markdown file per project and each one racks up as its own bay."
+          path="src/content/work/*.md"
+        />
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  /* The nav is fixed, so an index page has to open below it or its heading
+     plate lands underneath the bar. */
+  .page {
+    padding-block: clamp(118px, 15vh, 156px) var(--s8);
+  }
+
+  .page__grid {
+    display: grid;
+    gap: var(--s4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  }
+</style>

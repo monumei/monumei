@@ -1,0 +1,247 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import { bay } from '../../lib/format';
+
+export const getStaticPaths = (async () => {
+  const units = await getCollection('work', ({ data }) => !data.draft);
+  return units.map((unit) => ({ params: { slug: unit.id }, props: { unit } }));
+}) satisfies GetStaticPaths;
+
+const { unit } = Astro.props;
+const { Content } = await render(unit);
+
+const specs = [
+  { k: 'Bay', v: bay(unit.data.unit) },
+  { k: 'Primary', v: unit.data.tech },
+  { k: 'Status', v: unit.data.status },
+  ...(unit.data.year ? [{ k: 'Year', v: unit.data.year }] : []),
+];
+---
+
+<Base title={`${unit.data.title} — Monumei`} description={unit.data.summary} location="WORK">
+  <article class="unit-page rail">
+    <a class="unit-page__back data" href="/work/">← Selected Work</a>
+
+    <header class="unit-page__head">
+      <div class="unit-page__lede">
+        <p class="unit-page__addr data">{bay(unit.data.unit)}</p>
+        <h1 class="unit-page__title">{unit.data.title}</h1>
+        <p class="unit-page__summary">{unit.data.summary}</p>
+
+        <div class="unit-page__links">
+          {
+            unit.data.live && (
+              <a class="btn btn--primary" href={unit.data.live} rel="noopener">
+                Open live
+              </a>
+            )
+          }
+          {
+            unit.data.repo && (
+              <a class="btn btn--ghost" href={unit.data.repo} rel="noopener">
+                Source
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      <dl class="unit-page__spec panel notch-m">
+        {
+          specs.map((s) => (
+            <div class="unit-page__spec-row">
+              <dt class="data">{s.k}</dt>
+              <dd class="data">{s.v}</dd>
+            </div>
+          ))
+        }
+        {
+          unit.data.stack.length > 0 && (
+            <div class="unit-page__spec-row unit-page__spec-row--stack">
+              <dt class="data">Stack</dt>
+              <dd>
+                <ul class="unit-page__chips">
+                  {unit.data.stack.map((s) => (
+                    <li class="data">{s}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </header>
+
+    <div class="unit-page__rule led-channel"></div>
+
+    {
+      unit.data.sample && (
+        <aside class="notice" role="note">
+          <span class="notice__tag stencil">Sample module</span>
+          <p class="notice__body">
+            This project ships with the site as a structural reference — it is not one of
+            Monumei's real projects, and nothing on this page is a factual claim. Replace
+            <code>src/content/work/{unit.id}.md</code> with a real one.
+          </p>
+        </aside>
+      )
+    }
+
+    <div class="prose unit-page__body">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .unit-page {
+    padding-block: clamp(120px, 17vh, 180px) var(--s8);
+  }
+
+  .unit-page__back {
+    display: inline-block;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-block-end: var(--s6);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  .unit-page__back:hover {
+    color: var(--sig);
+  }
+
+  .unit-page__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.85fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+    margin-block-end: var(--s7);
+  }
+
+  .unit-page__addr {
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    color: var(--sig);
+    margin-block-end: var(--s4);
+  }
+
+  .unit-page__title {
+    font-size: clamp(2rem, 5.4vw, 3.8rem);
+    font-weight: 600;
+    line-height: 1.02;
+    margin-block-end: var(--s4);
+  }
+
+  .unit-page__summary {
+    max-width: 46ch;
+    font-size: 1.125rem;
+    line-height: 1.62;
+    color: var(--ink-3);
+  }
+
+  .unit-page__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    margin-block-start: var(--s6);
+  }
+
+  /* ── Spec plate ───────────────────────────────────────────────────────── */
+
+  .unit-page__spec {
+    padding: var(--s5);
+    margin: 0;
+  }
+
+  .unit-page__spec-row {
+    display: grid;
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: var(--s4);
+    align-items: baseline;
+    padding-block: var(--s3);
+    border-bottom: 1px solid var(--seam);
+    font-size: 0.75rem;
+  }
+
+  .unit-page__spec-row:last-child {
+    border-bottom: none;
+  }
+
+  .unit-page__spec-row dt {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .unit-page__spec-row dd {
+    margin: 0;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .unit-page__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .unit-page__chips li {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--ink-2);
+    background: var(--chassis-3);
+    border: 1px solid var(--seam);
+    padding: 3px 8px;
+  }
+
+  .unit-page__rule {
+    height: 2px;
+    margin-block-end: var(--s7);
+    --fill: 1;
+  }
+
+  /* ── Notice ───────────────────────────────────────────────────────────── */
+
+  .notice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    max-width: var(--measure);
+    margin-block-end: var(--s7);
+    padding: var(--s5);
+    background: var(--chassis-1);
+    border: 1px solid rgb(255 165 2 / 0.35);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .notice__tag {
+    color: var(--warn);
+  }
+
+  .notice__body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .notice__body code {
+    font-family: var(--font-data);
+    font-size: 0.85em;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .unit-page__head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

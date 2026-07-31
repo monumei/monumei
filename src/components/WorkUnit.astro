@@ -1,0 +1,201 @@
+---
+import { bay } from '../lib/format';
+
+interface Props {
+  href: string;
+  unit: number;
+  title: string;
+  summary: string;
+  tech: string;
+  status: string;
+  stack: string[];
+  sample?: boolean;
+}
+
+const { href, unit, title, summary, tech, status, stack, sample = false } = Astro.props;
+
+const tone: Record<string, string> = {
+  shipped: 'live',
+  maintained: 'sig',
+  ongoing: 'sig',
+  personal: 'idle',
+  archived: 'idle',
+};
+---
+
+{/* Motion comes from the parent .deck stage, scrubbed against scroll. */}
+<a class="unit panel notch-m" href={href}>
+  <div class="unit__rail" aria-hidden="true"></div>
+
+  <div class="unit__head">
+    <span class="unit__addr data">{bay(unit)}</span>
+    <span class="unit__tech data">{tech}</span>
+  </div>
+
+  <h3 class="unit__title">{title}</h3>
+  <p class="unit__summary">{summary}</p>
+
+  <ul class="unit__stack">
+    {stack.slice(0, 4).map((s) => <li class="unit__chip data">{s}</li>)}
+  </ul>
+
+  <div class="unit__foot">
+    <span class="unit__status">
+      <span class:list={['dot', tone[status] === 'idle' && 'dot--idle', tone[status] === 'sig' && 'dot--sig']}></span>
+      <span class="data">{status}</span>
+    </span>
+    {sample && <span class="unit__sample stencil">Sample</span>}
+    <span class="unit__go" aria-hidden="true">Inspect →</span>
+  </div>
+</a>
+
+<style>
+  .unit {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    padding: var(--s6) var(--s5) var(--s5) calc(var(--s5) + 6px);
+    color: inherit;
+    overflow: hidden;
+    transition:
+      border-color var(--t-base) var(--ease-snap),
+      background var(--t-base) var(--ease-snap),
+      transform var(--t-base) var(--ease-power),
+      box-shadow var(--t-base) var(--ease-power);
+  }
+
+  /* The bay's own LED strip, lighting when the unit is selected. */
+  .unit__rail {
+    position: absolute;
+    inset: 12px auto 12px 0;
+    width: 2px;
+    background: var(--chassis-3);
+    overflow: hidden;
+  }
+
+  .unit__rail::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--led-hot), var(--led) 40%, var(--led-deep));
+    box-shadow: var(--emit-led);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform var(--t-slow) var(--ease-power);
+  }
+
+  .unit:hover,
+  .unit:focus-visible {
+    background: var(--chassis-2);
+    border-color: rgb(46 123 255 / 0.5);
+    transform: translateY(-3px);
+    box-shadow: var(--lift-2);
+  }
+
+  .unit:hover .unit__rail::after,
+  .unit:focus-visible .unit__rail::after {
+    transform: scaleY(1);
+  }
+
+  .unit__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+  }
+
+  .unit__addr {
+    color: var(--ink-4);
+  }
+
+  .unit__tech {
+    color: var(--sig);
+    font-weight: 700;
+  }
+
+  .unit__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  .unit:hover .unit__title {
+    color: var(--led-hot);
+  }
+
+  .unit__summary {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .unit__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .unit__chip {
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    background: var(--chassis-3);
+    border: 1px solid var(--seam);
+    padding: 3px 8px;
+  }
+
+  .unit__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-block-start: auto;
+    padding-block-start: var(--s4);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .unit__status {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+  }
+
+  .unit__sample {
+    color: var(--warn);
+    font-size: 0.5625rem;
+  }
+
+  .unit__go {
+    margin-inline-start: auto;
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--led-hot);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity var(--t-base) var(--ease-snap),
+      transform var(--t-base) var(--ease-power);
+  }
+
+  .unit:hover .unit__go,
+  .unit:focus-visible .unit__go {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: none) {
+    .unit__go {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
