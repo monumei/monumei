@@ -16,3 +16,8 @@ node_modules/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# local tooling / design notes
+.claude/
+DESIGN.md
+PRODUCT.md
