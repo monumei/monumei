@@ -1,0 +1,179 @@
+---
+import { CHANNELS as channels } from '../lib/channels';
+
+/**
+ * The closing act.
+ *
+ * Three equal panels would have been the fourth grid of near-identical boxes
+ * on this page. This is the last thing a visitor sees and the only place
+ * asking them to do something, so it is built at display scale: three big
+ * ruled lines, the handle sitting quietly under each name.
+ *
+ * The handles themselves live in lib/channels so the footer and the shell
+ * print the same values.
+ */
+---
+
+<ul class="chs deck">
+  {
+    channels.map((c) => (
+      <li>
+        {c.href ? (
+          <a class="ch" href={c.href} rel={c.rel}>
+            <span class="ch__name">{c.name}</span>
+            <span class="ch__handle data">{c.handle}</span>
+            <span class="ch__verb data" aria-hidden="true">
+              {c.verb}
+            </span>
+            <span class="ch__rule" aria-hidden="true" />
+          </a>
+        ) : (
+          <button class="ch" type="button" data-copy={c.copy}>
+            <span class="ch__name">{c.name}</span>
+            <span class="ch__handle data">{c.handle}</span>
+            <span class="ch__verb data" aria-hidden="true">
+              {c.verb}
+            </span>
+            <span class="ch__rule" aria-hidden="true" />
+            <span class="sr-only">Copy Discord handle to clipboard</span>
+          </button>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<p class="chs__note data" role="status" aria-live="polite" id="copy-status"></p>
+
+<style>
+  .chs {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .ch {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s3) var(--s5);
+    width: 100%;
+    padding: clamp(14px, 2.4vh, 26px) 0;
+    text-align: left;
+    color: inherit;
+    border-block-end: 1px solid var(--seam);
+  }
+
+  .ch__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 4.6vw, 3rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    transition:
+      color var(--t-base) var(--ease-snap),
+      transform var(--t-base) var(--ease-power);
+  }
+
+  .ch:hover .ch__name,
+  .ch:focus-visible .ch__name {
+    color: var(--led-hot);
+    transform: translateX(10px);
+  }
+
+  .ch__handle {
+    grid-column: 1;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    transition: transform var(--t-base) var(--ease-power);
+  }
+
+  .ch:hover .ch__handle,
+  .ch:focus-visible .ch__handle {
+    transform: translateX(10px);
+  }
+
+  .ch__verb {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: center;
+    font-size: 0.625rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  .ch:hover .ch__verb,
+  .ch:focus-visible .ch__verb {
+    color: var(--sig);
+  }
+
+  .ch[data-copied] .ch__verb {
+    color: var(--live);
+  }
+
+  /* The LED draws along the full rule as the row is engaged. */
+  .ch__rule {
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--led), var(--led-hot));
+    box-shadow: var(--emit-led);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-slow) var(--ease-power);
+  }
+
+  .ch:hover .ch__rule,
+  .ch:focus-visible .ch__rule {
+    transform: scaleX(1);
+  }
+
+  .chs__note {
+    min-height: 1.4em;
+    margin-block-start: var(--s4);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--live);
+  }
+</style>
+
+<script>
+  const init = () => {
+    const status = document.getElementById('copy-status');
+
+    for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+      // init runs at module evaluation and again on `astro:page-load`.
+      if (btn.dataset.bound) continue;
+      btn.dataset.bound = '1';
+
+      btn.addEventListener('click', async () => {
+        const value = btn.dataset.copy ?? '';
+        const verb = btn.querySelector<HTMLElement>('.ch__verb');
+        try {
+          await navigator.clipboard.writeText(value);
+          btn.dataset.copied = 'true';
+          if (verb) verb.textContent = 'Copied';
+          if (status) status.textContent = `Discord handle ${value} copied`;
+          setTimeout(() => {
+            delete btn.dataset.copied;
+            if (verb) verb.textContent = 'Copy';
+            if (status) status.textContent = '';
+          }, 2200);
+        } catch {
+          // Clipboard blocked (insecure context, or the user denied it) —
+          // say what happened and what to do instead.
+          if (status) status.textContent = `Copy blocked — the handle is ${value}`;
+        }
+      });
+    }
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

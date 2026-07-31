@@ -1,0 +1,190 @@
+---
+import { CHANNELS, ROUTES } from '../lib/channels';
+
+/**
+ * The base plate.
+ *
+ * This used to be two lines of small caps with no navigation in it at all,
+ * which meant every page except the homepage dead-ended: finish a post and
+ * there is nowhere to go and no way to make contact. The closing act still
+ * owns contact at display scale on the homepage; this is its echo everywhere
+ * else — routes on one side, handles on the other, colophon underneath.
+ */
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="foot__hazard" aria-hidden="true"></div>
+
+  <div class="foot__inner rail">
+    <div class="foot__mark">
+      <p class="foot__wordmark">MONUMEI</p>
+      <p class="foot__line">Fullstack, cloud, and a drawing habit.</p>
+    </div>
+
+    <nav class="foot__col" aria-label="Sections">
+      <h2 class="foot__h stencil">Sections</h2>
+      <ul class="foot__list">
+        {
+          ROUTES.map((r) => (
+            <li>
+              <a class="foot__link" href={r.href}>
+                {r.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="foot__link" href="/rss.xml">
+            RSS feed
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="foot__col">
+      <h2 class="foot__h stencil">Channels</h2>
+      <ul class="foot__list">
+        {
+          CHANNELS.map((c) => (
+            <li>
+              {c.href ? (
+                <a class="foot__link" href={c.href} rel={c.rel}>
+                  {c.name}
+                  <span class="foot__handle data">{c.handle}</span>
+                </a>
+              ) : (
+                <span class="foot__link foot__link--static">
+                  {c.name}
+                  <span class="foot__handle data">{c.handle}</span>
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__colophon">
+    <div class="rail foot__colophon-inner">
+      <p class="foot__small data">© {year} Monumei</p>
+      <p class="foot__small data">Built with Astro · no trackers</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-block-start: var(--s9);
+    background: var(--chassis-0);
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .foot__hazard {
+    height: 4px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--sig) 0 5px,
+      transparent 5px 12px
+    );
+    opacity: 0.18;
+  }
+
+  .foot__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s7) var(--s6);
+    padding-block: var(--s8) var(--s7);
+  }
+
+  /* ── Mark ─────────────────────────────────────────────────────────────── */
+
+  .foot__wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 0.16em;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .foot__line {
+    max-width: 26ch;
+    margin-block-start: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  /* ── Columns ──────────────────────────────────────────────────────────── */
+
+  .foot__h {
+    color: var(--ink-4);
+    padding-block-end: var(--s3);
+    border-block-end: 1px solid var(--seam);
+  }
+
+  .foot__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    padding: 0;
+    margin-block-start: var(--s4);
+    list-style: none;
+  }
+
+  .foot__link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s3);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  a.foot__link:hover {
+    color: var(--sig);
+  }
+
+  .foot__link--static {
+    cursor: default;
+  }
+
+  .foot__handle {
+    font-size: 0.75rem;
+    color: var(--ink-4);
+  }
+
+  /* ── Colophon ─────────────────────────────────────────────────────────── */
+
+  .foot__colophon {
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .foot__colophon-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s3) var(--s5);
+    padding-block: var(--s5);
+  }
+
+  .foot__small {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+
+  @media (max-width: 760px) {
+    .foot__inner {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s6);
+      padding-block: var(--s7) var(--s6);
+    }
+  }
+</style>
