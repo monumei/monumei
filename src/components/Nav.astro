@@ -136,14 +136,30 @@ const links = [
     overflow: hidden;
     max-width: 12ch;
     transition:
+      width var(--t-base) var(--spring),
       max-width var(--t-base) var(--spring),
       opacity var(--t-fast) var(--ease-snap),
       margin var(--t-base) var(--spring);
   }
 
+  /* The readout swaps text as you scroll between sections. Cutting straight
+     from one word to the next reads as a glitch at this size, so the label
+     lifts out and drops back in around the change. */
+  .isle__loc > span {
+    display: inline-block;
+    transition:
+      opacity var(--t-fast) var(--ease-snap),
+      transform var(--t-fast) var(--ease-snap);
+  }
+
+  .isle__loc[data-swapping] > span {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
   .isle__reveal {
     display: grid;
-    grid-template-columns: 0fr;
+    grid-template-columns: minmax(0, 0fr);
     transition: grid-template-columns var(--t-base) var(--spring);
   }
 
@@ -182,7 +198,7 @@ const links = [
   .isle__pill:hover .isle__reveal,
   .isle__pill:focus-within .isle__reveal,
   .isle[data-open] .isle__pill .isle__reveal {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .isle__pill:hover .isle__link,
@@ -235,60 +251,67 @@ const links = [
   }
 
   @media (max-width: 720px) {
+    /* The capsule hugs its own row. The sheet is taken out of flow entirely —
+       as a flex item with flex-basis:100% it forced the closed capsule ~90px
+       wider than its contents, which is where the dead space came from. */
     .isle__pill {
-      flex-wrap: wrap;
-      border-radius: 22px;
+      position: relative;
+      flex-wrap: nowrap;
+      border-radius: 999px;
       padding: 7px 8px 7px 14px;
     }
 
-    .isle[data-open] .isle__pill {
-      background: rgb(9 10 13);
-    }
-
     .isle__reveal {
-      order: 4;
-      flex-basis: 100%;
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 0;
+      right: 0;
       grid-template-columns: 1fr;
-      grid-template-rows: 0fr;
+      /* minmax(0,…), not a bare 0fr: an fr track's automatic minimum is
+         min-content, so the sheet's own padding and border kept the closed
+         track 18px tall — a stray black bar hanging under the capsule. */
+      grid-template-rows: minmax(0, 0fr);
       overflow: hidden;
-      transition: grid-template-rows var(--t-base) var(--ease-power);
+      transition: grid-template-rows var(--t-slow) var(--spring);
     }
 
     .isle[data-open] .isle__pill .isle__reveal {
-      grid-template-rows: 1fr;
+      grid-template-rows: minmax(0, 1fr);
     }
 
+    /* Background lives on the inner item so the 0fr track clips it away
+       completely when closed — a border on the reveal itself would still
+       draw a hairline. */
     .isle__links {
       flex-direction: column;
       align-items: stretch;
       gap: 0;
       min-height: 0;
-      padding: 0;
       margin: 0;
-      border: 0;
+      padding: var(--s2) 0;
+      background: rgb(9 10 13);
+      border: 1px solid rgb(255 255 255 / 0.12);
+      border-radius: 18px;
+      box-shadow: var(--lift-3);
       overflow: hidden;
     }
 
     .isle__link {
-      padding: 11px var(--s3);
+      padding: 12px var(--s4);
     }
 
-    .isle__links > li:first-child .isle__link {
-      margin-block-start: var(--s2);
-      border-block-start: 1px solid rgb(255 255 255 / 0.1);
-      padding-block-start: 15px;
-    }
-
-    .isle__links > li:last-child .isle__link {
-      padding-block-end: 15px;
+    /* The readout stays put on mobile: the sheet opens below rather than
+       taking the capsule's width, so nothing needs to make room for it. */
+    .isle__pill:hover .isle__loc,
+    .isle__pill:focus-within .isle__loc,
+    .isle[data-open] .isle__pill .isle__loc {
+      max-width: 12ch;
+      opacity: 1;
+      margin-inline-end: 0;
     }
 
     .isle:not([data-open]) .isle__pill:hover .isle__reveal {
-      grid-template-rows: 0fr;
-    }
-
-    .isle[data-open] .isle__reveal {
-      grid-template-rows: 1fr;
+      grid-template-rows: minmax(0, 0fr);
     }
 
     .isle:not([data-open]) .isle__pill:hover .isle__link {
@@ -297,12 +320,6 @@ const links = [
 
     .isle[data-open] .isle__pill .isle__link {
       opacity: 1;
-    }
-
-    .isle:not([data-open]) .isle__pill:hover .isle__loc {
-      max-width: 12ch;
-      opacity: 1;
-      margin-inline-end: 0;
     }
   }
 
@@ -317,6 +334,10 @@ const links = [
 </style>
 
 <script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let swapTimer = 0;
+  let releaseTimer = 0;
+
   const setOpen = (toggle: HTMLButtonElement, open: boolean) => {
     toggle.setAttribute('aria-expanded', String(open));
     const label = toggle.querySelector('.sr-only');
@@ -376,7 +397,34 @@ const links = [
           best = el;
         }
       }
-      loc.textContent = best?.dataset.loc || home;
+      const next = best?.dataset.loc || home;
+      if (next === loc.textContent) return;
+
+      const wrap = loc.parentElement;
+      if (!wrap || reduceMotion.matches) {
+        loc.textContent = next;
+        return;
+      }
+
+      // Pin the slot to its current width first, so swapping a short label for
+      // a long one animates the capsule open instead of snapping it. The pill
+      // itself is auto-width, so widening this slot carries the whole island.
+      clearTimeout(swapTimer);
+      clearTimeout(releaseTimer);
+      wrap.style.width = `${loc.offsetWidth}px`;
+      wrap.setAttribute('data-swapping', '');
+
+      swapTimer = window.setTimeout(() => {
+        loc.textContent = next;
+        wrap.style.width = `${loc.offsetWidth}px`;
+        wrap.removeAttribute('data-swapping');
+
+        // Hand the slot back to auto once it has settled, so a viewport
+        // resize can still re-fit it.
+        releaseTimer = window.setTimeout(() => {
+          wrap.style.width = '';
+        }, 420);
+      }, 140);
     };
 
     io = new IntersectionObserver(
