@@ -1,0 +1,334 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import { longDate, iso, stamp } from '../../lib/format';
+import { getPosts, neighbours } from '../../lib/log';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// An entry that ends with nowhere to go is a dead end; the log is a sequence,
+// so each post carries the two entries either side of it.
+const { newer, older } = neighbours(await getPosts(), post.id);
+---
+
+<Base title={`${post.data.title} — Monumei`} description={post.data.summary} location="LOG">
+  <article class="post rail rail--read">
+    <div class="post__head">
+      <a class="post__back data" href="/blog/">← The Log</a>
+
+      <div class="post__meta data">
+        <a class="post__channel" href={`/blog/channel/${post.data.channel.toLowerCase()}/`}>
+          {post.data.channel}
+        </a>
+        <span class="post__sep" aria-hidden="true">/</span>
+        <time datetime={iso(post.data.date)}>{longDate(post.data.date)}</time>
+      </div>
+
+      <h1 class="post__title">{post.data.title}</h1>
+      <p class="post__summary">{post.data.summary}</p>
+
+      {
+        post.data.tags.length > 0 && (
+          <ul class="post__tags">
+            {post.data.tags.map((t) => (
+              <li class="post__tag data">{t}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      <div class="post__channel-rule led-channel"></div>
+    </div>
+
+    {
+      post.data.cover && (
+        <figure class="post__cover">
+          <Image
+            src={post.data.cover}
+            alt={post.data.coverAlt ?? ''}
+            widths={[720, 1080, 1440]}
+            sizes="(max-width: 1360px) 100vw, 1360px"
+            loading="eager"
+          />
+        </figure>
+      )
+    }
+
+    {
+      post.data.sample && (
+        <aside class="notice" role="note">
+          <span class="notice__tag stencil">Sample entry</span>
+          <p class="notice__body">
+            This post ships with the site as a formatting reference — it is not Monumei's
+            writing. Delete <code>src/content/blog/{post.id}.md</code> or remove its
+            <code>sample: true</code> flag once you replace the content.
+          </p>
+        </aside>
+      )
+    }
+
+    <div class="prose post__body">
+      <Content />
+    </div>
+
+    {
+      (newer || older) && (
+        <nav class="around" aria-label="More entries">
+          <div class="around__rule led-channel" style="--fill:1" />
+          <div class="around__pair">
+            {newer ? (
+              <a class="around__item" href={`/blog/${newer.id}/`}>
+                <span class="around__dir data">← Newer</span>
+                <span class="around__title">{newer.data.title}</span>
+                <span class="around__date data">{stamp(newer.data.date)}</span>
+              </a>
+            ) : (
+              <span class="around__item around__item--end">
+                <span class="around__dir data">Newer</span>
+                <span class="around__none">This is the latest entry.</span>
+              </span>
+            )}
+
+            {older ? (
+              <a class="around__item around__item--right" href={`/blog/${older.id}/`}>
+                <span class="around__dir data">Older →</span>
+                <span class="around__title">{older.data.title}</span>
+                <span class="around__date data">{stamp(older.data.date)}</span>
+              </a>
+            ) : (
+              <span class="around__item around__item--right around__item--end">
+                <span class="around__dir data">Older</span>
+                <span class="around__none">Start of the log.</span>
+              </span>
+            )}
+          </div>
+        </nav>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  /* A reading page, not a chassis page: one centred column at a comfortable
+     measure, everything in it aligned to that column. The rail's 1360px is
+     right for grids and racks and far too wide for prose. */
+  .post {
+    padding-block: clamp(120px, 17vh, 180px) var(--s8);
+  }
+
+  .post__head {
+    margin-block-end: var(--s7);
+  }
+
+  .post__back {
+    display: inline-block;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-block-end: var(--s5);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  .post__back:hover {
+    color: var(--sig);
+  }
+
+  .post__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-block-end: var(--s4);
+  }
+
+  .post__channel {
+    color: var(--sig);
+    font-weight: 700;
+    transition: opacity var(--t-fast) var(--ease-snap);
+  }
+
+  .post__channel:hover {
+    opacity: 0.7;
+  }
+
+  .post__title {
+    font-size: clamp(2rem, 5.2vw, 3.6rem);
+    font-weight: 600;
+    line-height: 1.04;
+    margin-block-end: var(--s4);
+    overflow-wrap: anywhere;
+  }
+
+  .post__summary {
+    font-size: 1.125rem;
+    line-height: 1.62;
+    color: var(--ink-3);
+    margin-block-end: var(--s5);
+  }
+
+  .post__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0;
+    margin-block-end: var(--s6);
+    list-style: none;
+  }
+
+  .post__tag {
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    background: var(--chassis-2);
+    border: 1px solid var(--seam);
+    padding: 3px 8px;
+  }
+
+  /* An article is not a scroll stage, so this rule is simply lit. */
+  .post__channel-rule {
+    height: 2px;
+    --fill: 1;
+  }
+
+  .post__cover {
+    --notch: var(--notch-m);
+    margin-block-end: var(--s7);
+    border: 1px solid var(--seam);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--notch)) 0,
+      100% var(--notch),
+      100% 100%,
+      var(--notch) 100%,
+      0 calc(100% - var(--notch))
+    );
+  }
+
+  .post__cover :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .notice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    margin-block-end: var(--s7);
+    padding: var(--s5);
+    background: var(--chassis-1);
+    border: 1px solid rgb(255 165 2 / 0.35);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .notice__tag {
+    color: var(--warn);
+  }
+
+  .notice__body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+  }
+
+  .notice__body code {
+    font-family: var(--font-data);
+    font-size: 0.85em;
+    color: var(--ink-2);
+  }
+
+  /* ── Newer / older ────────────────────────────────────────────────────── */
+
+  .around {
+    margin-block-start: var(--s9);
+  }
+
+  .around__pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .around__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    padding: var(--s5) var(--s4);
+    color: inherit;
+    transition: background var(--t-fast) var(--ease-snap);
+  }
+
+  .around__item + .around__item {
+    border-inline-start: 1px solid var(--seam);
+  }
+
+  .around__item--right {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  a.around__item:hover {
+    background: var(--chassis-1);
+  }
+
+  .around__dir {
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  a.around__item:hover .around__dir {
+    color: var(--sig);
+  }
+
+  .around__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  a.around__item:hover .around__title {
+    color: var(--led-hot);
+  }
+
+  .around__date {
+    font-size: 0.6875rem;
+    color: var(--ink-4);
+  }
+
+  .around__none {
+    font-size: 0.9375rem;
+    color: var(--ink-4);
+  }
+
+  @media (max-width: 640px) {
+    .around__pair {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .around__item--right {
+      text-align: left;
+      align-items: flex-start;
+    }
+
+    .around__item + .around__item {
+      border-inline-start: none;
+      border-block-start: 1px solid var(--seam);
+    }
+  }
+</style>

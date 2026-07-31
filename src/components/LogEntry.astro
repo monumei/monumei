@@ -1,0 +1,170 @@
+---
+import { stamp, iso } from '../lib/format';
+
+/**
+ * A row in a ledger, not a card.
+ *
+ * The Log and the Work rack were the same card grid twice, which is what made
+ * the lower half of the page feel repetitive. A log is a register of dated
+ * entries, so it is built as full-width ruled rows: date, channel, title,
+ * action. Work stays chunky and physical. Two different objects, two
+ * different shapes.
+ */
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  channel: string;
+  date: Date;
+  sample?: boolean;
+}
+
+const { href, title, summary, channel, date, sample = false } = Astro.props;
+---
+
+<a class="row" href={href}>
+  <span class="row__sweep" aria-hidden="true"></span>
+
+  <time class="row__date data" datetime={iso(date)}>{stamp(date)}</time>
+  <span class="row__channel data">{channel}</span>
+
+  <span class="row__body">
+    <span class="row__title">{title}</span>
+    <span class="row__summary">{summary}</span>
+    {sample && <span class="row__sample stencil">Sample entry</span>}
+  </span>
+
+  <span class="row__go" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 92px 74px minmax(0, 1fr) 28px;
+    align-items: baseline;
+    gap: var(--s4);
+    padding: clamp(16px, 2.2vh, 24px) var(--s4);
+    color: inherit;
+    border-block-end: 1px solid var(--seam);
+    overflow: hidden;
+    transition: background var(--t-fast) var(--ease-snap);
+  }
+
+  .row:first-child {
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .row:hover,
+  .row:focus-visible {
+    background: var(--chassis-1);
+  }
+
+  /* The LED runs the length of the row on hover, the same light as the
+     spine and the section channels. */
+  .row__sweep {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--led), var(--led-hot));
+    box-shadow: var(--emit-led);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-base) var(--ease-power);
+  }
+
+  .row:hover .row__sweep,
+  .row:focus-visible .row__sweep {
+    transform: scaleX(1);
+  }
+
+  .row__date {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-4);
+  }
+
+  .row__channel {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--sig);
+  }
+
+  .row__body {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .row__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.05rem, 1.9vw, 1.4rem);
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    transition: color var(--t-fast) var(--ease-snap);
+  }
+
+  .row:hover .row__title {
+    color: var(--led-hot);
+  }
+
+  .row__summary {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--ink-3);
+  }
+
+  .row__sample {
+    color: var(--warn);
+    font-size: 0.5625rem;
+    margin-block-start: 2px;
+  }
+
+  .row__go {
+    justify-self: end;
+    font-size: 1rem;
+    color: var(--ink-4);
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      transform var(--t-base) var(--ease-power);
+  }
+
+  .row:hover .row__go,
+  .row:focus-visible .row__go {
+    color: var(--sig);
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 720px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr) 24px;
+      grid-template-areas:
+        'meta go'
+        'body body';
+      gap: var(--s2) var(--s3);
+    }
+
+    .row__date {
+      grid-area: meta;
+    }
+
+    /* The channel joins the date on one meta line rather than taking a
+       column of its own. */
+    .row__channel {
+      grid-area: meta;
+      justify-self: end;
+      margin-inline-end: var(--s4);
+    }
+
+    .row__body {
+      grid-area: body;
+    }
+
+    .row__go {
+      grid-area: go;
+    }
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import ModulePlate from '../../../components/ModulePlate.astro';
+import LogEntry from '../../../components/LogEntry.astro';
+import ChannelBar from '../../../components/ChannelBar.astro';
+import { getPosts, channelCounts } from '../../../lib/log';
+import { CHANNEL_NOTES, type ChannelName } from '../../../content.config';
+
+/**
+ * One page per channel that actually has entries in it.
+ *
+ * Building routes only for occupied channels means the filter row can never
+ * link to an empty page, and no dead URLs go into the sitemap.
+ */
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return channelCounts(posts).map(({ channel }) => ({
+    params: { channel: channel.toLowerCase() },
+    props: { channel },
+  }));
+}) satisfies GetStaticPaths;
+
+const { channel } = Astro.props as { channel: ChannelName };
+
+const all = await getPosts();
+const counts = channelCounts(all);
+const posts = all.filter((p) => p.data.channel === channel);
+const note = CHANNEL_NOTES[channel];
+---
+
+<Base
+  title={`${channel} — The Log — Monumei`}
+  description={`${note}. ${posts.length} ${posts.length === 1 ? 'entry' : 'entries'} in the ${channel} channel of Monumei's log.`}
+  location="LOG"
+>
+  <div class="page rail">
+    <ModulePlate
+      title={channel}
+      meta={`${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}`}
+    />
+
+    <p class="page__note">{note}</p>
+
+    <ChannelBar counts={counts} current={channel} total={all.length} />
+
+    <div class="deck ledger" data-stage="view">
+      {
+        posts.map((p) => (
+          <LogEntry
+            href={`/blog/${p.id}/`}
+            title={p.data.title}
+            summary={p.data.summary}
+            channel={p.data.channel}
+            date={p.data.date}
+            sample={p.data.sample}
+          />
+        ))
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* The nav is fixed, so an index page has to open below it or its heading
+     plate lands underneath the bar. */
+  .page {
+    padding-block: clamp(118px, 15vh, 156px) var(--s8);
+  }
+
+  .page__note {
+    max-width: var(--measure);
+    margin-block-end: var(--s5);
+    color: var(--ink-3);
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import type { ChannelName } from '../content.config';
+import { CHANNEL_NOTES } from '../content.config';
+
+/**
+ * The log's filter row.
+ *
+ * Every chip is a real link to a real route, so filtering works with
+ * JavaScript off, deep-links, and gives each channel a page that can be
+ * shared on its own. A client-side filter would have looked identical and
+ * done none of that.
+ *
+ * Channels with nothing in them are not printed — an empty filter is a dead
+ * control, and a row of them reads as scaffolding.
+ */
+interface Props {
+  counts: { channel: ChannelName; count: number }[];
+  /** The channel currently being viewed, or undefined on the full index. */
+  current?: ChannelName;
+  total: number;
+}
+
+const { counts, current, total } = Astro.props;
+---
+
+{
+  counts.length > 1 && (
+    <nav class="chan" aria-label="Filter by channel">
+      <a class="chan__chip" href="/blog/" aria-current={current ? undefined : 'page'}>
+        All
+        <span class="chan__n data">{total}</span>
+      </a>
+
+      {counts.map((c) => (
+        <a
+          class="chan__chip"
+          href={`/blog/channel/${c.channel.toLowerCase()}/`}
+          title={CHANNEL_NOTES[c.channel]}
+          aria-current={current === c.channel ? 'page' : undefined}
+        >
+          {c.channel}
+          <span class="chan__n data">{c.count}</span>
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+<style>
+  .chan {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin-block-end: var(--s6);
+  }
+
+  .chan__chip {
+    --notch: 6px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s2);
+    padding: 7px 13px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    background: var(--chassis-1);
+    border: 1px solid var(--seam);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--notch)) 0,
+      100% var(--notch),
+      100% 100%,
+      var(--notch) 100%,
+      0 calc(100% - var(--notch))
+    );
+    transition:
+      color var(--t-fast) var(--ease-snap),
+      background var(--t-fast) var(--ease-snap),
+      border-color var(--t-fast) var(--ease-snap);
+  }
+
+  .chan__chip:hover {
+    color: var(--sig);
+    background: var(--chassis-2);
+    border-color: var(--seam-strong);
+  }
+
+  .chan__chip[aria-current='page'] {
+    color: var(--void);
+    background: var(--sig);
+    border-color: var(--sig);
+  }
+
+  .chan__n {
+    font-size: 0.625rem;
+    color: var(--ink-4);
+    letter-spacing: 0.06em;
+  }
+
+  .chan__chip[aria-current='page'] .chan__n {
+    color: rgb(8 9 11 / 0.62);
+  }
+</style>
