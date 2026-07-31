@@ -268,7 +268,7 @@ const lines = [
     }
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 860px), (max-height: 700px) {
     .sys {
       height: auto;
     }
@@ -277,7 +277,7 @@ const lines = [
       position: static;
       height: auto;
       padding-block: var(--s9);
-      overflow: visible;
+      overflow: clip;
     }
 
     .sys__item {

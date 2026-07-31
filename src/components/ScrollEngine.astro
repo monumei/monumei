@@ -8,23 +8,41 @@
 
   const active = new Set<HTMLElement>();
   const written = new WeakMap<HTMLElement, string>();
+  const frames = new WeakMap<HTMLElement, { frame: HTMLElement | null; sticky: boolean }>();
 
   let io: IntersectionObserver | null = null;
   let queued = false;
   let bound = false;
   let lastScroll = '';
 
+  const refresh = (stages: HTMLElement[]) => {
+    for (const el of stages) {
+      const frame = el.firstElementChild as HTMLElement | null;
+      const sticky = !!frame && getComputedStyle(frame).position === 'sticky';
+      frames.set(el, { frame, sticky });
+    }
+  };
+
+  const viewProgress = (rect: DOMRect) => {
+    const vh = window.innerHeight;
+    return (vh - rect.top) / (vh + rect.height);
+  };
+
   const measure = (el: HTMLElement) => {
     const mode = (el.dataset.stage as Mode) ?? 'view';
     const rect = el.getBoundingClientRect();
-    const vh = window.innerHeight;
 
     let p: number;
     if (mode === 'pin') {
-      const travel = rect.height - vh;
-      p = travel > 0 ? -rect.top / travel : 0;
+      const info = frames.get(el);
+      if (info?.sticky && info.frame) {
+        const travel = rect.height - info.frame.offsetHeight;
+        p = travel > 0 ? -rect.top / travel : 0;
+      } else {
+        p = viewProgress(rect);
+      }
     } else {
-      p = (vh - rect.top) / (vh + rect.height);
+      p = viewProgress(rect);
     }
 
     p = p < 0 ? 0 : p > 1 ? 1 : p;
@@ -77,6 +95,8 @@
       return;
     }
 
+    refresh(stages);
+
     io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -96,12 +116,18 @@
 
     for (const el of stages) io.observe(el);
 
+    const onResize = () => {
+      refresh(stages);
+      measureTracks();
+      schedule();
+    };
+
     if (!bound) {
       bound = true;
       addEventListener('scroll', schedule, { passive: true });
-      addEventListener('resize', schedule, { passive: true });
-      addEventListener('resize', measureTracks, { passive: true });
-      if (document.fonts?.ready) document.fonts.ready.then(measureTracks);
+      addEventListener('resize', onResize, { passive: true });
+      addEventListener('orientationchange', onResize);
+      if (document.fonts?.ready) document.fonts.ready.then(onResize);
     }
 
     measureTracks();
