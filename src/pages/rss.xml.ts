@@ -2,10 +2,6 @@ import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { getPosts } from '../lib/log';
 
-/**
- * The log's feed. Built at compile time, so it costs nothing at runtime and
- * cannot drift from what the site actually publishes.
- */
 export async function GET(context: APIContext) {
   const posts = await getPosts();
 

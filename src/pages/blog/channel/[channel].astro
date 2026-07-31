@@ -7,12 +7,6 @@ import ChannelBar from '../../../components/ChannelBar.astro';
 import { getPosts, channelCounts } from '../../../lib/log';
 import { CHANNEL_NOTES, type ChannelName } from '../../../content.config';
 
-/**
- * One page per channel that actually has entries in it.
- *
- * Building routes only for occupied channels means the filter row can never
- * link to an empty page, and no dead URLs go into the sitemap.
- */
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
   return channelCounts(posts).map(({ channel }) => ({
@@ -62,8 +56,6 @@ const note = CHANNEL_NOTES[channel];
 </Base>
 
 <style>
-  /* The nav is fixed, so an index page has to open below it or its heading
-     plate lands underneath the bar. */
   .page {
     padding-block: clamp(118px, 15vh, 156px) var(--s8);
   }

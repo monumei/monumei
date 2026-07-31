@@ -1,26 +1,4 @@
 ---
-/**
- * Scroll engine — the spine of the whole page.
- *
- * Every animated passage is a "stage" that publishes a single number, `--p`
- * (0 → 1), describing how far the reader has scrolled through it. All motion
- * is then plain CSS reading that number, which means the choreography is
- * *scrubbed* against the scroll position rather than fired once on entry.
- * That difference is what separates a camera move from a fade-in.
- *
- *   data-stage="pin"   the stage is taller than the viewport and its inner
- *                      panel is sticky; p runs across the extra height.
- *   data-stage="view"  p runs from the moment the element enters the viewport
- *                      to the moment it leaves.
- *
- * Only stages currently on screen are measured, and all reads happen in one
- * rAF pass, so this stays cheap no matter how many stages exist.
- *
- * With view transitions on, the document survives navigation: the observer is
- * rebuilt against the new page's stages, while the scroll and resize listeners
- * are attached once for the life of the session rather than accumulating one
- * copy per page visited.
- */
 ---
 
 <script>
@@ -29,9 +7,6 @@
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const active = new Set<HTMLElement>();
-  // Last written value per stage. Re-writing an identical custom property
-  // still invalidates that subtree's style, so skipping no-op writes is most
-  // of the win when the page is barely moving.
   const written = new WeakMap<HTMLElement, string>();
 
   let io: IntersectionObserver | null = null;
@@ -53,8 +28,6 @@
     }
 
     p = p < 0 ? 0 : p > 1 ? 1 : p;
-    // Three decimals is finer than a single pixel of travel on any of these
-    // stages, and cuts the write rate substantially.
     const next = p.toFixed(3);
     if (written.get(el) === next) return;
     written.set(el, next);
@@ -65,9 +38,6 @@
     queued = false;
     for (const el of active) measure(el);
 
-    // The spine is the only consumer of document progress. Writing it on
-    // :root invalidated the style of every element on the page each frame;
-    // writing it on the spine itself invalidates one node.
     const spine = document.querySelector<HTMLElement>('.spine');
     if (spine) {
       const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -85,8 +55,6 @@
     requestAnimationFrame(frame);
   };
 
-  // Horizontal tracks need a measured travel distance in pixels; CSS can't
-  // derive "how much wider than its container" on its own.
   const measureTracks = () => {
     for (const track of document.querySelectorAll<HTMLElement>('[data-track]')) {
       const travel = Math.max(0, track.scrollWidth - track.clientWidth);
@@ -105,7 +73,6 @@
     if (!stages.length) return;
 
     if (reduce.matches) {
-      // Hold every stage at a settled, legible state.
       for (const el of stages) el.style.setProperty('--p', '1');
       return;
     }
@@ -119,8 +86,6 @@
             measure(el);
           } else {
             active.delete(el);
-            // Park the stage at whichever end it left by, so a stage scrolled
-            // past stays finished rather than snapping back.
             el.style.setProperty('--p', entry.boundingClientRect.top < 0 ? '1' : '0');
           }
         }

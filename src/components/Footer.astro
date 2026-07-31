@@ -1,15 +1,6 @@
 ---
 import { CHANNELS, ROUTES } from '../lib/channels';
 
-/**
- * The base plate.
- *
- * This used to be two lines of small caps with no navigation in it at all,
- * which meant every page except the homepage dead-ended: finish a post and
- * there is nowhere to go and no way to make contact. The closing act still
- * owns contact at display scale on the homepage; this is its echo everywhere
- * else — routes on one side, handles on the other, colophon underneath.
- */
 const year = new Date().getFullYear();
 ---
 
@@ -98,8 +89,6 @@ const year = new Date().getFullYear();
     padding-block: var(--s8) var(--s7);
   }
 
-  /* ── Mark ─────────────────────────────────────────────────────────────── */
-
   .foot__wordmark {
     font-family: var(--font-display);
     font-weight: 700;
@@ -116,8 +105,6 @@ const year = new Date().getFullYear();
     line-height: 1.6;
     color: var(--ink-3);
   }
-
-  /* ── Columns ──────────────────────────────────────────────────────────── */
 
   .foot__h {
     color: var(--ink-4);
@@ -158,8 +145,6 @@ const year = new Date().getFullYear();
     color: var(--ink-4);
   }
 
-  /* ── Colophon ─────────────────────────────────────────────────────────── */
-
   .foot__colophon {
     border-block-start: 1px solid var(--seam);
   }
@@ -178,7 +163,6 @@ const year = new Date().getFullYear();
     text-transform: uppercase;
     color: var(--ink-4);
   }
-
 
   @media (max-width: 760px) {
     .foot__inner {

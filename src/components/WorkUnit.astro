@@ -23,7 +23,6 @@ const tone: Record<string, string> = {
 };
 ---
 
-{/* Motion comes from the parent .deck stage, scrubbed against scroll. */}
 <a class="unit panel notch-m" href={href}>
   <div class="unit__rail" aria-hidden="true"></div>
 
@@ -65,7 +64,6 @@ const tone: Record<string, string> = {
       box-shadow var(--t-base) var(--ease-power);
   }
 
-  /* The bay's own LED strip, lighting when the unit is selected. */
   .unit__rail {
     position: absolute;
     inset: 12px auto 12px 0;

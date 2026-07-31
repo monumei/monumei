@@ -1,27 +1,6 @@
 ---
 import { ROUTES } from '../lib/channels';
 
-/**
- * The island.
- *
- * A floating capsule rather than a full-width bar: collapsed it shows the mark
- * and the module you are currently in, and it morphs open — width, not just
- * opacity — to reveal the routes. Hover or focus on a pointer device, tap on
- * touch.
- *
- * **This is the one place the site breaks its own zero-radius rule.** Every
- * other surface is chamfered; a Dynamic Island that is not a capsule is not a
- * Dynamic Island, and the owner asked for that specific feel. The chamfer still
- * shows up in the LED diamond and the focus ring, so it does not read as a
- * component borrowed from another site.
- *
- * The morph uses a grid `0fr → 1fr` track rather than animating `width` to a
- * measured pixel value: it stays smooth, needs no JS measurement, and reflows
- * correctly when the label inside changes length.
- *
- * No backdrop-filter. The island floats over art that repaints every frame,
- * which is the worst case for it; a near-opaque fill reads the same here.
- */
 interface Props {
   location?: string;
 }
@@ -44,8 +23,6 @@ const links = [
 
     <span class="isle__sep" aria-hidden="true"></span>
 
-    {/* Collapsed readout: which module you are in. Swaps out as the panel
-        opens, so the capsule never shows both at once. */}
     <span class="isle__loc data" aria-hidden="true">
       <span id="nav-loc" data-home={location}>{location}</span>
     </span>
@@ -112,8 +89,6 @@ const links = [
     background: rgb(11 13 17 / 0.97);
   }
 
-  /* ── Mark ─────────────────────────────────────────────────────────────── */
-
   .isle__mark {
     display: flex;
     align-items: center;
@@ -122,8 +97,6 @@ const links = [
     color: var(--ink);
   }
 
-  /* The chamfer survives here: the capsule is the borrowed shape, the diamond
-     is the site's own. */
   .isle__led {
     width: 9px;
     height: 9px;
@@ -154,8 +127,6 @@ const links = [
     background: rgb(255 255 255 / 0.14);
   }
 
-  /* ── Collapsed readout ────────────────────────────────────────────────── */
-
   .isle__loc {
     flex: none;
     font-size: 0.625rem;
@@ -169,11 +140,6 @@ const links = [
       opacity var(--t-fast) var(--ease-snap),
       margin var(--t-base) var(--spring);
   }
-
-  /* ── The morph ────────────────────────────────────────────────────────────
-     A 0fr → 1fr grid track: the panel animates its own width without anyone
-     measuring it, and re-animates correctly if the link set changes.
-     ──────────────────────────────────────────────────────────────────────── */
 
   .isle__reveal {
     display: grid;
@@ -213,7 +179,6 @@ const links = [
     color: var(--sig);
   }
 
-  /* Open: the routes take their width, the readout gives up its own. */
   .isle__pill:hover .isle__reveal,
   .isle__pill:focus-within .isle__reveal,
   .isle[data-open] .isle__pill .isle__reveal {
@@ -234,8 +199,6 @@ const links = [
     opacity: 0;
     margin-inline-end: calc(var(--s3) * -1);
   }
-
-  /* ── Toggle ───────────────────────────────────────────────────────────── */
 
   .isle__toggle {
     display: grid;
@@ -265,20 +228,11 @@ const links = [
     transform: translateY(1px) rotate(-135deg);
   }
 
-  /* On a wide pointer device hover already opens it, so the button is
-     redundant chrome. The width clause is load-bearing: below 720px the sheet
-     layout deliberately ignores hover, so hiding the button on a narrow desktop
-     window too would leave no way at all to open the nav. */
   @media (hover: hover) and (pointer: fine) and (min-width: 721px) {
     .isle__toggle {
       display: none;
     }
   }
-
-  /* ── Narrow ───────────────────────────────────────────────────────────────
-     The capsule can't hold five routes on a phone, so opening drops them into
-     a stacked sheet under the mark — still one object, still morphing.
-     ──────────────────────────────────────────────────────────────────────── */
 
   @media (max-width: 720px) {
     .isle__pill {
@@ -287,25 +241,15 @@ const links = [
       padding: 7px 8px 7px 14px;
     }
 
-    /* Opaque once open: the sheet covers the page rather than ghosting the
-       headings behind it. Selector deliberately mirrors the shape of the
-       hover/focus rule above — a shorter one loses to it on specificity even
-       though it comes later. */
     .isle[data-open] .isle__pill {
       background: rgb(9 10 13);
     }
 
-    /* Same 0fr → 1fr trick as the desktop width, on the row axis. Animating
-       max-height would thrash layout and needs a magic number tall enough for
-       the longest sheet; a grid track just measures itself. */
     .isle__reveal {
       order: 4;
       flex-basis: 100%;
       grid-template-columns: 1fr;
       grid-template-rows: 0fr;
-      /* The sheet's own border and padding still occupy the collapsed track,
-         so the container clips them; without this the capsule keeps a ~25px
-         sliver of empty sheet while closed. */
       overflow: hidden;
       transition: grid-template-rows var(--t-base) var(--ease-power);
     }
@@ -314,10 +258,6 @@ const links = [
       grid-template-rows: 1fr;
     }
 
-    /* Bare: padding, margin and border on the grid item itself survive a 0fr
-       track (min-height only frees the content box), which left a 25px sliver
-       of open sheet while closed. The spacing lives on the children instead,
-       where overflow: hidden can clip it away. */
     .isle__links {
       flex-direction: column;
       align-items: stretch;
@@ -343,7 +283,6 @@ const links = [
       padding-block-end: 15px;
     }
 
-    /* Hover must not open the sheet on touch — only the button does. */
     .isle:not([data-open]) .isle__pill:hover .isle__reveal {
       grid-template-rows: 0fr;
     }
@@ -378,19 +317,6 @@ const links = [
 </style>
 
 <script>
-  // ── Open / close ────────────────────────────────────────────────────────
-  // Delegated from the document and bound exactly once, for two reasons: this
-  // module's init runs both at evaluation and on `astro:page-load`, so binding
-  // straight to the button attached two handlers that cancelled each other out;
-  // and view transitions replace the header wholesale, which would strand any
-  // direct reference anyway.
-
-  // The open state is a `data-open` attribute on the header, not a `:has()`
-  // test against the button's aria-expanded. Both express the same thing, but
-  // engines do not reliably re-run style invalidation for `:has()` when the
-  // attribute it inspects is mutated — the selector matched on query and the
-  // capsule stayed shut. An attribute on the styled element itself always
-  // invalidates.
   const setOpen = (toggle: HTMLButtonElement, open: boolean) => {
     toggle.setAttribute('aria-expanded', String(open));
     const label = toggle.querySelector('.sr-only');
@@ -414,7 +340,6 @@ const links = [
       return;
     }
 
-    // Following a link, or clicking anywhere outside the capsule, closes it.
     if (target.closest('.isle__link') || !target.closest('.isle__pill')) {
       setOpen(toggle, false);
     }
@@ -429,14 +354,11 @@ const links = [
     }
   });
 
-  // ── The readout ─────────────────────────────────────────────────────────
   let io: IntersectionObserver | null = null;
 
   const init = () => {
     const loc = document.getElementById('nav-loc');
 
-    // Names the module currently under the island. Sections opt in by carrying
-    // data-loc; pages without any keep the route's own label.
     io?.disconnect();
     io = null;
 

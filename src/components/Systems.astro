@@ -1,21 +1,4 @@
 ---
-/**
- * Pinned act — the middle of the page and its one big move.
- *
- * Three statements, all drawn from what's actually true about Monumei, resolve
- * one at a time as the reader scrolls a pinned frame. The board behind them
- * pushes and pans on its own timing, so foreground and background separate.
- *
- * Each statement now carries its own evidence in a second column. That column
- * was empty before — the copy sat in the left 40% of a full-bleed stage and the
- * rest was board texture. It is also the one place the stack is listed: the
- * homepage used to recite it four separate times, so instead of a decorative
- * marquee the tools now sit against the discipline they belong to, stated once.
- *
- * Cloud deliberately has no tool list. Monumei is learning it, and inventing a
- * row of provider logos to balance the layout would be exactly the kind of
- * decoration-as-fact this site refuses.
- */
 const systems = [
   {
     k: 'Fullstack web',
@@ -138,7 +121,6 @@ const lines = [
     background: var(--chassis-0);
   }
 
-  /* Background moves further and slower than the type in front of it. */
   .sys__board {
     position: absolute;
     inset: -12%;
@@ -151,8 +133,6 @@ const lines = [
     height: 100%;
   }
 
-  /* The wash follows the copy column; the right side stays open so the board
-     reads through behind the evidence. */
   .sys__veil {
     position: absolute;
     inset: 0;
@@ -184,14 +164,6 @@ const lines = [
     list-style: none;
   }
 
-  /* Exactly one row is lit at a time.
-
-     --l is this row's local position in the scroll (< 0 before its turn,
-     0→1 during, > 1 after). --in ramps up as the row arrives, --out ramps up
-     once the next row takes over, and the difference is a clean on/off
-     window. The previous approach left every passed row at partial opacity,
-     which is why nothing looked highlighted — three rows at 0.5, 0.7 and 1.0
-     read as a wall of text, not as a sequence. */
   .sys__item {
     --l: calc(var(--p) * var(--n) - var(--i));
     --in: clamp(0, calc(var(--l) * 3.4), 1);
@@ -222,8 +194,6 @@ const lines = [
     transform-origin: top;
   }
 
-  /* The lit row also gains weight and colour, so the highlight survives even
-     where the board behind it is busy. */
   .sys__k {
     font-size: clamp(1.4rem, 3.2vw, 2.5rem);
     font-weight: 600;
@@ -239,12 +209,8 @@ const lines = [
     color: var(--ink-3);
   }
 
-  /* ── Evidence ─────────────────────────────────────────────────────────── */
-
   .sys__evidence {
     padding-block-start: 0.4em;
-    /* Arrives a beat after its statement, so the eye reads left then right
-       rather than both at once. */
     opacity: calc(clamp(0, calc((var(--l) - 0.18) * 3.4), 1) - var(--out));
     transform: translate3d(calc((1 - var(--act)) * 14px), 0, 0);
   }

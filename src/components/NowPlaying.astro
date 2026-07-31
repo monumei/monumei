@@ -1,15 +1,4 @@
 ---
-/**
- * Now playing — the one live readout on the site.
- *
- * It used to sit inside the Loadout act, which was removed: the tech list was
- * stated four separate times on the homepage and that repetition was the
- * page's biggest tell. This panel survived the cut because it is the only
- * thing on the page reporting something that is actually changing.
- *
- * The embed host goes down regularly, so a failure prints a plate rather than
- * a broken-image glyph.
- */
 const spotify =
   'https://spotify-github-profile.kittinanx.com/api/view?uid=o8930qm21yhjrgc1u6sk8jz54&cover_image=true&theme=natemoo-re&show_offline=true&background_color=121212&interchange=false&bar_color=53b14f&bar_color_cover=false';
 ---
@@ -114,9 +103,6 @@ const spotify =
 </style>
 
 <script>
-  // Swap in the printed plate rather than leaving a broken-image glyph — and
-  // check images that already failed before this script parsed, which a plain
-  // error listener would miss.
   const init = () => {
     const fail = (img: HTMLImageElement) => {
       img.hidden = true;
@@ -125,7 +111,6 @@ const spotify =
     };
 
     for (const img of document.querySelectorAll<HTMLImageElement>('img[data-embed]')) {
-      // init runs at module evaluation and again on `astro:page-load`.
       if (img.dataset.bound) continue;
       img.dataset.bound = '1';
 

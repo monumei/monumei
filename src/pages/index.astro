@@ -22,15 +22,11 @@ const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.unit - b.data.unit
 );
 
-// The rail carries the gallery itself, so it follows the collection rather
-// than being pinned to one import. Featured pieces lead.
 const art = (await getArt()).sort(
   (a, b) => Number(b.data.featured) - Number(a.data.featured)
 );
 const artCounts = artistCounts(art);
 
-// The homepage shows a curated few; the full lists live on their own pages.
-// That is what keeps each pinned act inside one viewport as the collections grow.
 const recent = posts.slice(0, 3);
 const rack = units.slice(0, 3);
 
@@ -160,7 +156,6 @@ const termArt = art.map((a) => ({
     <NowPlaying />
   </Act>
 
-  {/* Serves the credit controls in the art rail above. */}
   {art.length > 0 && <ArtistCard />}
 </Base>
 

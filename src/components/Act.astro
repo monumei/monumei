@@ -1,22 +1,8 @@
 ---
-/**
- * A pinned act.
- *
- * The section is taller than the viewport; its frame sticks for the whole of
- * that extra height. So the reader arrives, the act holds still while its
- * content plays out against `--p`, and only once it has finished does the
- * next act push it off. Sections stop sliding past each other and start
- * taking turns.
- *
- * `budget` is how much scroll the act gets beyond one viewport — larger for
- * acts with more to say. It is expressed in vh and added to 100.
- */
 interface Props {
   id?: string;
   labelledby?: string;
-  /** Extra scroll height in vh beyond the first viewport. */
   budget?: number;
-  /** The label the nav readout prints while this act is under the bar. */
   loc?: string;
   class?: string;
 }
@@ -60,9 +46,6 @@ const { id, labelledby, budget = 80, loc, class: cls } = Astro.props;
     padding-block: 72px var(--s6);
   }
 
-  /* Pinning needs vertical room. Where there isn't any — short laptop
-     windows, phones — the act reverts to an ordinary section so content is
-     never trapped inside a frame smaller than itself. */
   @media (max-width: 860px), (max-height: 700px) {
     .act {
       height: auto;

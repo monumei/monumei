@@ -10,10 +10,6 @@ import { getArt, artistCounts, artistKey } from '../../lib/art';
 const all = await getArt();
 const counts = artistCounts(all);
 
-// Commissions lead, because that is what this gallery mostly is: the OC drawn
-// by the artists who were paid to draw them. Monumei's own pieces follow.
-// Mixing the two into one wall would quietly imply authorship of work that
-// isn't theirs.
 const commissions = all.filter((a) => a.data.commissioned);
 const own = all.filter((a) => !a.data.commissioned);
 
@@ -89,8 +85,6 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
 </Base>
 
 <style>
-  /* The nav is fixed, so an index page has to open below it or its heading
-     plate lands underneath the bar. */
   .page {
     padding-block: clamp(118px, 15vh, 156px) var(--s8);
   }
@@ -135,9 +129,6 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
     color: var(--ink-3);
   }
 
-  /* A real grid with one tile size, so the wall reads as a set regardless of
-     what each source file's resolution happens to be. Tiles crop to a shared
-     portrait ratio; the lightbox is where a piece is seen uncropped. */
   .wall {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));

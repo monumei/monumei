@@ -2,16 +2,6 @@
 import { stamp, bay } from '../lib/format';
 import { CHANNELS } from '../lib/channels';
 
-/**
- * The shell.
- *
- * A terminal that only prints canned strings is a costume. This one is a real
- * way around the site: `go` and `open` reach every route, `search` runs over
- * the log, the rack and the gallery, and Tab completes commands and arguments.
- * Everything it prints comes from the collections rather than being typed in
- * here twice — which is also why `skills` is gone. The stack was stated four
- * times on this page; Systems says it once now, and the shell doesn't repeat it.
- */
 interface Props {
   posts: { title: string; date: Date; href: string }[];
   units: { unit: number; title: string; tech: string; href: string }[];
@@ -143,10 +133,6 @@ const data = {
     color: var(--ink-4);
   }
 
-  /* Results are links, so a search result can be followed with the keyboard
-     rather than retyping it as an `open` argument. They are laid out as their
-     own lines — an inline anchor would run consecutive results together into
-     one unreadable string. */
   .term__out :global(a.l-link) {
     display: block;
     width: fit-content;
@@ -212,8 +198,6 @@ const data = {
     const raw = document.getElementById('term-data')?.textContent;
     if (!screen || !out || !form || !input || !raw) return;
 
-    // init runs both at module evaluation and on `astro:page-load`, so without
-    // this the shell binds twice and every command echoes twice.
     if (form.dataset.bound) return;
     form.dataset.bound = '1';
 
@@ -270,9 +254,6 @@ const data = {
         ],
       },
 
-      // The personal trivia used to sit on the first viewport, where it
-      // competed with what a visitor actually came to find out. It is better
-      // as something you go looking for.
       funfacts: {
         help: 'the things not on the CV',
         run: () => [
@@ -407,7 +388,6 @@ const data = {
             return [];
           }
 
-          // A section on this page is a scroll target rather than a route.
           const section = document.getElementById(name);
           if (section) {
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -436,7 +416,6 @@ const data = {
             return [];
           }
 
-          // `open log` used to work, so it keeps working.
           return commands.go.run(arg);
         },
       },
@@ -463,7 +442,6 @@ const data = {
         return;
       }
 
-      // Kept because muscle memory reaches for them.
       const alias: Record<string, string> = {
         blog: 'log',
         projects: 'work',
@@ -488,10 +466,6 @@ const data = {
       ]);
     };
 
-    // ── Completion ───────────────────────────────────────────────────────
-    // Tab completes the command, and for the commands that take a known set
-    // of arguments, the argument too.
-
     const argsFor = (name: string): string[] => {
       if (name === 'go' || name === 'cd') return data.routes.map((r) => r.name);
       if (name === 'open') return data.units.map((u) => u.addr);
@@ -514,7 +488,6 @@ const data = {
         return;
       }
 
-      // Several candidates: fill in as far as they agree, then list them.
       let shared = matches[0];
       for (const m of matches) {
         while (!m.toLowerCase().startsWith(shared.toLowerCase())) {
@@ -553,9 +526,6 @@ const data = {
       }
     });
 
-    // Clicking anywhere on the screen focuses the prompt, the way a real
-    // terminal pane behaves — but never steals focus from a selection, and
-    // never from a result link the reader is trying to click.
     screen.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('a')) return;
       if (!window.getSelection()?.toString()) input.focus();

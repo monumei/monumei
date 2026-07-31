@@ -3,38 +3,17 @@ import { Image, getImage } from 'astro:assets';
 import { artistPayload, type ArtEntry } from '../lib/art';
 import { stamp } from '../lib/format';
 
-/**
- * One piece in the gallery.
- *
- * The tile is an anchor to the full-resolution file, so with JavaScript off a
- * click still opens the artwork. The lightbox script intercepts that click and
- * shows it in the dialog instead — enhancement on top of a working link, not a
- * button that does nothing until JS arrives.
- *
- * Corner brackets on the two square corners, chamfer on the two cut ones: the
- * tactical-card idiom, drawn in the chassis vocabulary this site already owns.
- *
- * Credit sits on the tile, not behind a hover. Where the artist has links, the
- * handle is a control that opens their card; where the credit is still being
- * chased it prints a warning plate rather than quietly reading as Monumei's own
- * work.
- */
 interface Props {
   entry: ArtEntry;
-  /** How many pieces this artist drew in the gallery, for their card. */
   artistCount?: number;
 }
 
 const { entry, artistCount = 1 } = Astro.props;
 const d = entry.data;
 
-// The lightbox shows a larger render than the tile does.
 const full = await getImage({ src: d.image, widths: [1600], format: 'webp' });
 
 const credited = !!d.artist;
-// The credit only becomes a control once there is somewhere for it to lead.
-// A button that opens a panel saying "no links yet" is a dead end dressed up
-// as an affordance; until then the name is simply printed.
 const hasCard = credited && d.artistLinks.length > 0;
 const payload = hasCard ? artistPayload(d, artistCount) : undefined;
 const label = d.artistHandle || d.artist || '';
@@ -102,9 +81,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
 </figure>
 
 <style>
-  /* Rows align because every tile is the same shape: the frame owns the
-     aspect ratio and the caption sits under it, so a 2500px square and a
-     1900x2596 portrait produce identical cards. */
   .piece {
     display: flex;
     flex-direction: column;
@@ -135,8 +111,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
     border-color: rgb(46 123 255 / 0.5);
   }
 
-  /* The brackets land on the two corners the chamfer leaves square, and only
-     once the piece is engaged — a permanently bracketed tile is decoration. */
   .piece__link::before,
   .piece__link::after {
     z-index: 1;
@@ -155,8 +129,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Biased to the top of the frame: these are character pieces, so when the
-       crop has to give something up it should be the feet, not the face. */
     object-position: 50% 12%;
     transition: transform var(--t-slow) var(--ease-power);
   }
@@ -165,8 +137,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
     transform: scale(1.03);
   }
 
-  /* The same light the rest of the chassis uses, drawn across the base of the
-     frame when the piece is engaged. */
   .piece__rule {
     position: absolute;
     inset: auto 0 0 0;
@@ -188,7 +158,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
     flex-direction: column;
     gap: 5px;
     padding-block-start: var(--s3);
-    /* Keeps captions bottom-aligned across a row when one title wraps. */
     margin-block-start: auto;
   }
 
@@ -232,7 +201,6 @@ const verb = d.commissioned ? 'Drawn by' : 'By';
     transition: border-color var(--t-fast) var(--ease-snap);
   }
 
-  /* Printed, not clickable — no links on file for this artist yet. */
   .piece__credit--flat .piece__credit-name {
     border-bottom: none;
   }

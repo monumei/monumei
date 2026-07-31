@@ -1,15 +1,6 @@
 ---
 import { stamp, iso } from '../lib/format';
 
-/**
- * A row in a ledger, not a card.
- *
- * The Log and the Work rack were the same card grid twice, which is what made
- * the lower half of the page feel repetitive. A log is a register of dated
- * entries, so it is built as full-width ruled rows: date, channel, title,
- * action. Work stays chunky and physical. Two different objects, two
- * different shapes.
- */
 interface Props {
   href: string;
   title: string;
@@ -60,8 +51,6 @@ const { href, title, summary, channel, date, sample = false } = Astro.props;
     background: var(--chassis-1);
   }
 
-  /* The LED runs the length of the row on hover, the same light as the
-     spine and the section channels. */
   .row__sweep {
     position: absolute;
     inset: auto 0 0 0;
@@ -151,8 +140,6 @@ const { href, title, summary, channel, date, sample = false } = Astro.props;
       grid-area: meta;
     }
 
-    /* The channel joins the date on one meta line rather than taking a
-       column of its own. */
     .row__channel {
       grid-area: meta;
       justify-self: end;

@@ -1,16 +1,4 @@
 ---
-/**
- * The heading plate for a section.
- *
- * It sticks under the nav while its own section scrolls beneath it, and is
- * pushed out of the way by the next section's plate. That is what stops the
- * lower half of the page reading as a stack of disconnected blocks: at any
- * moment you can see which module you are inside, and the handover from one
- * to the next is a visible event rather than a gap.
- *
- * `.plate` itself carries no transform — a transform here would fight the
- * sticky positioning — so the entrance motion lives on the inner row.
- */
 interface Props {
   title: string;
   meta?: string;
@@ -29,8 +17,6 @@ const { title, meta, id } = Astro.props;
 </div>
 
 <style>
-  /* The whole act pins now, so the plate travels with its content rather
-     than sticking on its own. */
   .plate {
     margin-block-end: clamp(24px, 4vh, 44px);
   }
@@ -56,8 +42,6 @@ const { title, meta, id } = Astro.props;
     color: var(--ink-4);
   }
 
-  /* Fills with the section's own scroll progress — it is the same light as
-     the spine, so it has to behave like it rather than snapping on. */
   .plate__channel {
     height: 2px;
   }

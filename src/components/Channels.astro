@@ -1,17 +1,5 @@
 ---
 import { CHANNELS as channels } from '../lib/channels';
-
-/**
- * The closing act.
- *
- * Three equal panels would have been the fourth grid of near-identical boxes
- * on this page. This is the last thing a visitor sees and the only place
- * asking them to do something, so it is built at display scale: three big
- * ruled lines, the handle sitting quietly under each name.
- *
- * The handles themselves live in lib/channels so the footer and the shell
- * print the same values.
- */
 ---
 
 <ul class="chs deck">
@@ -116,7 +104,6 @@ import { CHANNELS as channels } from '../lib/channels';
     color: var(--live);
   }
 
-  /* The LED draws along the full rule as the row is engaged. */
   .ch__rule {
     position: absolute;
     inset: auto 0 -1px 0;
@@ -148,7 +135,6 @@ import { CHANNELS as channels } from '../lib/channels';
     const status = document.getElementById('copy-status');
 
     for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
-      // init runs at module evaluation and again on `astro:page-load`.
       if (btn.dataset.bound) continue;
       btn.dataset.bound = '1';
 
@@ -166,8 +152,6 @@ import { CHANNELS as channels } from '../lib/channels';
             if (status) status.textContent = '';
           }, 2200);
         } catch {
-          // Clipboard blocked (insecure context, or the user denied it) —
-          // say what happened and what to do instead.
           if (status) status.textContent = `Copy blocked — the handle is ${value}`;
         }
       });

@@ -14,8 +14,6 @@ export const getStaticPaths = (async () => {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-// An entry that ends with nowhere to go is a dead end; the log is a sequence,
-// so each post carries the two entries either side of it.
 const { newer, older } = neighbours(await getPosts(), post.id);
 ---
 
@@ -117,9 +115,6 @@ const { newer, older } = neighbours(await getPosts(), post.id);
 </Base>
 
 <style>
-  /* A reading page, not a chassis page: one centred column at a comfortable
-     measure, everything in it aligned to that column. The rail's 1360px is
-     right for grids and racks and far too wide for prose. */
   .post {
     padding-block: clamp(120px, 17vh, 180px) var(--s8);
   }
@@ -196,7 +191,6 @@ const { newer, older } = neighbours(await getPosts(), post.id);
     padding: 3px 8px;
   }
 
-  /* An article is not a scroll stage, so this rule is simply lit. */
   .post__channel-rule {
     height: 2px;
     --fill: 1;
@@ -247,8 +241,6 @@ const { newer, older } = neighbours(await getPosts(), post.id);
     font-size: 0.85em;
     color: var(--ink-2);
   }
-
-  /* ── Newer / older ────────────────────────────────────────────────────── */
 
   .around {
     margin-block-start: var(--s9);

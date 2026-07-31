@@ -1,20 +1,4 @@
 ---
-/**
- * The artist card.
- *
- * Clicking a credit anywhere in the gallery opens this: who drew the piece,
- * their handle, how many pieces of theirs hang here, and every place they can
- * actually be found and hired. The point of the section is that the artists are
- * named, so the credit is a real destination rather than a line of small print.
- *
- * Built in the chassis vocabulary — corner brackets, hazard rule, machined
- * seams — rather than pulling in a component library: the tactical-HUD card
- * idiom is already this site's own language.
- *
- * One dialog serves every credit on the page. It binds to any `[data-artist]`
- * control, so tiles and the lightbox share it without either knowing about the
- * other.
- */
 ---
 
 <dialog class="ac" id="artist-card" aria-labelledby="ac-name">
@@ -45,8 +29,6 @@
   .ac {
     width: min(460px, 92vw);
     max-width: none;
-    /* The reset's `* { margin: 0 }` also strips the UA's `margin: auto` on a
-       modal dialog, which is what centres it. Put it back. */
     margin: auto;
     padding: 0;
     background: var(--chassis-1);
@@ -150,8 +132,6 @@
     border-block-start: 1px solid var(--seam);
   }
 
-  /* Rows rather than a row of chips: each destination gets its full name, so
-     "ArtStation" and "commissions open" read as different things. */
   .ac__link {
     display: flex;
     align-items: center;
@@ -215,8 +195,6 @@
     const dialog = document.getElementById('artist-card') as HTMLDialogElement | null;
     if (!dialog) return;
 
-    // init runs at module evaluation and again on `astro:page-load`; the
-    // delegated document listener below must not stack up.
     if (dialog.dataset.bound) return;
     dialog.dataset.bound = '1';
 
@@ -226,7 +204,6 @@
     const linksEl = document.getElementById('ac-links')!;
     const noneEl = document.getElementById('ac-none')!;
 
-    // Whatever opened the card gets focus back when it closes.
     let opener: HTMLElement | null = null;
 
     const open = (artist: Artist, from: HTMLElement) => {
@@ -269,8 +246,6 @@
       dialog.showModal();
     };
 
-    // One listener for every credit on the page, including ones inside the
-    // lightbox — which is itself a dialog, so this card opens on top of it.
     document.addEventListener('click', (e) => {
       const trigger = (e.target as HTMLElement)?.closest<HTMLElement>('[data-artist]');
       if (!trigger) return;

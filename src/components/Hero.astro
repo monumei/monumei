@@ -3,13 +3,6 @@ import { Image } from 'astro:assets';
 import Rain from './Rain.astro';
 import hero from '../assets/hero.png';
 
-// The spec plate is gone. Every cell it held was said better somewhere else on
-// the same screen — the role by the heading, the focus by the blurb verbatim —
-// and the personal trivia it used to carry (maimai counts, what's in the mug)
-// now lives in the shell under `funfacts`. What is left is a headline, a
-// sentence, and two buttons.
-
-// Deterministic city bokeh — distant windows, thrown well out of focus.
 let s = 0x2545f491;
 const rand = () => {
   s ^= s << 13;
@@ -139,9 +132,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     --p: 0;
     position: relative;
     height: 250vh;
-    /* The scene layers are absolutely positioned against this element, so on
-       viewports where the frame is not the containing block they would
-       otherwise escape the frame's own clipping. */
     overflow: clip;
   }
 
@@ -153,8 +143,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     background: #05070e;
     isolation: isolate;
   }
-
-  /* ── Scene layers ─────────────────────────────────────────────────────── */
 
   .scene,
   .scene--front {
@@ -176,9 +164,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
       linear-gradient(180deg, #0c1730 0%, #080e1e 46%, #05070e 100%);
   }
 
-  /* The blur that used to soften these lived on a layer that moves with
-     scroll, so it re-rasterised constantly. The circles now carry their own
-     falloff via a gradient fill instead — same look, no filter. */
   .scene__bokeh {
     position: absolute;
     inset: 0;
@@ -207,14 +192,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
       radial-gradient(120% 92% at 50% 44%, transparent 52%, rgb(0 0 0 / 0.72) 100%);
   }
 
-  /* ── Wordmark: behind the figure ──────────────────────────────────────── */
-
-  /* Lifted clear of the copy block below. The figure crosses the middle of
-     the name, which is the point — but the type must not collide with the
-     sentence a visitor actually has to read. */
-  /* Type left, figure right. The name runs from the same rail the copy below
-     it sits on, and the figure crosses its tail — occluding the end of a
-     wordmark is the key-art move; colliding with body copy is not. */
   .word {
     position: absolute;
     inset: 0;
@@ -241,13 +218,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     text-shadow: 0 0 60px rgb(46 123 255 / 0.75);
   }
 
-  /* ── Figure: in front of the wordmark ─────────────────────────────────── */
-
-  /* The source art is cropped hard at its right and bottom edges. Rather
-     than showing those cuts, the figure is bled past both: the umbrella's
-     sliced edge leaves the frame on the right, and the cropped legs leave it
-     at the bottom. A soft mask on the trailing edge catches whatever the
-     bleed doesn't, so no straight cut is ever visible against the sky. */
   .figure {
     position: absolute;
     inset: 0;
@@ -267,18 +237,10 @@ const bokeh = Array.from({ length: 46 }, () => ({
     margin-block-end: -4%;
     object-fit: contain;
     object-position: bottom right;
-    /* drop-shadow removed: paired with the scroll-driven scale it forced the
-       whole image to re-rasterise every frame. The scene's haze already
-       seats the figure against the background. */
     -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent 99%);
     mask-image: linear-gradient(90deg, #000 78%, transparent 99%);
   }
 
-  /* ── UI ───────────────────────────────────────────────────────────────── */
-
-  /* The block is bottom-anchored, so its bottom padding is what sets how high
-     it sits. Losing the spec plate dropped the copy onto the floor of the
-     viewport; this lifts it back into the frame, clear of the scroll cue. */
   .hero__ui {
     position: absolute;
     inset: auto 0 0 0;
@@ -289,11 +251,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     padding-block: clamp(60px, 12vh, 130px) clamp(80px, 17vh, 190px);
   }
 
-  /* Scrim: the copy has to stay readable wherever the art happens to be bright
-     behind it, without dimming the whole scene — and without announcing itself
-     as a box. Full-bleed, tall, and with enough stops that no single edge in
-     the ramp is visible. z-index 2 puts it above the wordmark and below the
-     figure (3), so the character is never dimmed by it. */
   .hero__scrim {
     position: absolute;
     inset: auto 0 0 0;
@@ -349,8 +306,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     margin-block-start: var(--s2);
   }
 
-  /* ── Scroll cue ───────────────────────────────────────────────────────── */
-
   .hero__cue {
     position: absolute;
     right: var(--gutter);
@@ -359,8 +314,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     display: flex;
     align-items: center;
     gap: var(--s3);
-    /* Holds while the first beat is pure art — it is the only instruction on
-       screen — then leaves as soon as the copy it points to has arrived. */
     opacity: calc(1 - clamp(0, calc((var(--p) - 0.1) * 7), 1));
   }
 
@@ -402,11 +355,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     }
   }
 
-  /* ═══ PARALLAX ══════════════════════════════════════════════════════════
-     Each layer's own rate. Far things barely move and the near ones travel
-     hard, which is the entire reason the scene reads as having depth.
-     ═══════════════════════════════════════════════════════════════════════ */
-
   .l-sky {
     transform: translate3d(0, calc(var(--p) * 5vh), 0) scale(calc(1 + var(--p) * 0.06));
   }
@@ -424,17 +372,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     transform: translate3d(0, calc(var(--p) * -20vh), 0) scale(calc(1 + var(--p) * 0.14));
   }
 
-  /* ── The hero's beats ───────────────────────────────────────────────────
-     0.00 → 0.16   key art alone: the figure and the name, nothing else.
-     0.16 → 0.40   the role and the sentence arrive.
-     0.50 → 1.00   the whole scene recedes, back to front, into the next act.
-     Art holds longest because it is the thing worth looking at; the copy
-     leaves first because it has already been read.
-     ─────────────────────────────────────────────────────────────────────── */
-
-  /* No animated blur. Re-blurring display-size type on every frame was one
-     of the most expensive things on the page, and opacity plus scale reads
-     as the same recession for a fraction of the cost. */
   .l-word {
     --e: clamp(0, calc((var(--p) - 0.5) * 2.4), 1);
     opacity: calc(1 - var(--e));
@@ -456,13 +393,9 @@ const bokeh = Array.from({ length: 46 }, () => ({
     transform: translate3d(0, calc((1 - var(--r)) * 44px - var(--e) * 6vh), 0);
   }
 
-
-  /* The scrim only earns its keep once there is copy to protect. */
   .l-scrim {
     opacity: clamp(0, calc((var(--p) - 0.12) * 5), 1);
   }
-
-  /* ── Boot ─────────────────────────────────────────────────────────────── */
 
   @media (prefers-reduced-motion: no-preference) {
     :global(.js) .word__text {
@@ -475,9 +408,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
 
   }
 
-  /* No blur here either: a 24px blur across display-size type is a very
-     expensive first second. Opening wide and settling in reads as the same
-     "resolving" gesture and costs nothing. */
   @keyframes word-resolve {
     from {
       opacity: 0;
@@ -492,9 +422,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
       transform: translateY(5%) scale(1.04);
     }
   }
-
-
-  /* ── Responsive ───────────────────────────────────────────────────────── */
 
   @media (max-width: 1180px) {
     .figure :global(img) {
@@ -514,8 +441,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     }
   }
 
-  /* On a phone the pinned camera runs out of room, so the hero becomes an
-     ordinary tall section with the scene still intact. */
   @media (max-width: 720px) {
     .hero {
       height: auto;

@@ -2,20 +2,8 @@
 import type { ChannelName } from '../content.config';
 import { CHANNEL_NOTES } from '../content.config';
 
-/**
- * The log's filter row.
- *
- * Every chip is a real link to a real route, so filtering works with
- * JavaScript off, deep-links, and gives each channel a page that can be
- * shared on its own. A client-side filter would have looked identical and
- * done none of that.
- *
- * Channels with nothing in them are not printed — an empty filter is a dead
- * control, and a row of them reads as scaffolding.
- */
 interface Props {
   counts: { channel: ChannelName; count: number }[];
-  /** The channel currently being viewed, or undefined on the full index. */
   current?: ChannelName;
   total: number;
 }

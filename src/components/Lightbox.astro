@@ -1,14 +1,4 @@
 ---
-/**
- * The gallery's viewer.
- *
- * A native <dialog>, not a hand-rolled overlay: it gets the top layer, focus
- * trapping, Escape-to-close, and inert background for free, which is most of
- * what a lightbox library is actually selling.
- *
- * Every tile is a working link to the image file before this script runs. The
- * script upgrades that click to the dialog; it never creates the only way in.
- */
 ---
 
 <dialog class="lb" id="lightbox" aria-label="Artwork viewer">
@@ -44,16 +34,9 @@
 </dialog>
 
 <style>
-  /* No `position` here. A modal dialog is centred by the UA against the
-     viewport, and overriding its position drops it back into normal document
-     flow — which puts it wherever the page happens to be scrolled to. The
-     absolutely-positioned close button still resolves against it, because the
-     UA's own positioning makes the dialog a containing block. */
   .lb {
     width: min(1180px, 94vw);
     max-width: none;
-    /* The reset's `* { margin: 0 }` also strips the UA's `margin: auto` on a
-       modal dialog, which is what centres it. Put it back. */
     margin: auto;
     padding: 0;
     background: var(--chassis-1);
@@ -62,12 +45,6 @@
     overflow: hidden;
   }
 
-  /* A definite height, then a column that distributes it: the artwork takes
-     whatever is left after the step bar instead of the three parts summing
-     past the window. A fixed frame also means stepping between pieces of
-     different proportions doesn't resize the dialog under the pointer.
-     `display` is set only on [open] — a dialog with a display value while
-     closed is a visible dialog. */
   .lb[open] {
     display: flex;
     flex-direction: column;
@@ -141,7 +118,6 @@
     flex-direction: column;
     gap: var(--s3);
     min-height: 0;
-    /* Clears the close button, which sits in this column's top corner. */
     padding: 56px var(--s5) var(--s6);
     border-inline-start: 1px solid var(--seam);
     overflow-y: auto;
@@ -260,8 +236,6 @@
   @media (max-width: 860px) {
     .lb__figure {
       grid-template-columns: minmax(0, 1fr);
-      /* The artwork takes the room that is left; the caption keeps its own
-         height and scrolls if the note is long. */
       grid-template-rows: minmax(0, 1fr) auto;
     }
 
@@ -280,7 +254,6 @@
     const tiles = [...document.querySelectorAll<HTMLAnchorElement>('[data-piece]')];
     if (!dialog || !tiles.length) return;
 
-    // init runs at module evaluation and again on `astro:page-load`.
     if (dialog.dataset.bound) return;
     dialog.dataset.bound = '1';
 
@@ -312,12 +285,9 @@
 
       medium.textContent = d.medium ?? '';
 
-      // Pieces without a known date simply don't print one.
       date.textContent = d.date ?? '';
       date.hidden = !d.date;
 
-      // The credit opens the artist's card, which is bound globally to
-      // [data-artist] — so this control needs the payload and nothing else.
       if (d.artistLabel && d.artistPayload) {
         credit.textContent = d.artistLabel;
         credit.dataset.artist = d.artistPayload;
@@ -341,7 +311,6 @@
 
     tiles.forEach((tile, i) => {
       tile.addEventListener('click', (e) => {
-        // Leave modified clicks alone so "open in new tab" still works.
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
         e.preventDefault();
         show(i);
@@ -357,14 +326,10 @@
       if (e.key === 'ArrowRight') step(1);
     });
 
-    // Clicking the backdrop closes. The dialog element itself is the click
-    // target only when the pointer lands outside its content box.
     dialog.addEventListener('click', (e) => {
       if (e.target === dialog) dialog.close();
     });
 
-    // Returning focus to the tile that opened the viewer keeps keyboard
-    // position after Escape.
     dialog.addEventListener('close', () => tiles[index]?.focus());
   };
 

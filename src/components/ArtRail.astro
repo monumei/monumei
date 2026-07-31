@@ -2,30 +2,9 @@
 import { Image } from 'astro:assets';
 import { artistPayload, type ArtEntry } from '../lib/art';
 
-/**
- * The art rail.
- *
- * This replaced a full-bleed band that gave one image an entire viewport. A
- * single picture at that scale is a takeover, not a section — and it could only
- * ever show one piece, which is the wrong shape for a gallery that is mostly
- * commissions of the same character by different artists.
- *
- * The rail travels sideways against vertical scroll, on the same `--p` every
- * other stage uses. `ScrollEngine` measures the viewport's overflow into
- * `--travel`, because CSS cannot work out "how much wider than its container"
- * on its own; the track then reads both numbers and translates.
- *
- * Below 860px, without JS, and under reduced-motion it degrades to an ordinary
- * swipeable rail with scroll snapping — a pinned horizontal carousel needs
- * viewport height and a pointer it cannot assume it has.
- */
 interface Props {
   pieces: ArtEntry[];
   counts: Map<string, number>;
-  /**
-   * Vertical scroll spent per pixel of horizontal travel. Below 1 the rail
-   * moves faster than the page; above 1 it drags.
-   */
   pace?: number;
 }
 
@@ -105,19 +84,13 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 <style>
   .arail {
     --p: 0;
-    /* Content starts on the same line as every other section, then bleeds
-       past the right edge. */
     --pad: max(var(--gutter), calc((100vw - var(--rail)) / 2));
     --cell-h: clamp(260px, 50vh, 460px);
     position: relative;
-    /* The pin lasts exactly as long as there is rail left to travel, measured
-       below. Until then it is a single viewport, so a rail with nothing to
-       scroll never reserves dead scroll height. */
     height: calc(100svh + var(--budget, 0px));
     background: var(--chassis-0);
   }
 
-  /* Set when the pieces already fit: no travel, so no reason to pin. */
   .arail[data-static] {
     height: auto;
   }
@@ -183,12 +156,9 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     padding-inline: var(--pad);
     margin: 0;
     list-style: none;
-    /* --travel is written by ScrollEngine onto the viewport and inherits. */
     transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
     will-change: transform;
   }
-
-  /* ── Cell ─────────────────────────────────────────────────────────────── */
 
   .cell {
     display: flex;
@@ -201,9 +171,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     position: relative;
     display: block;
     height: var(--cell-h);
-    /* One card shape for the whole rail, matching the gallery grid. Sizing
-       each cell to its own aspect ratio made the strip ragged and meant the
-       travel distance changed with whatever happened to be in the collection. */
     aspect-ratio: 3 / 4;
     overflow: hidden;
     background: var(--chassis-1);
@@ -223,7 +190,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Faces survive the crop; feet do not. */
     object-position: 50% 12%;
     transition: transform var(--t-slow) var(--ease-power);
   }
@@ -296,7 +262,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     border-bottom-color: var(--sig);
   }
 
-  /* Printed, not clickable — no links on file for this artist yet. */
   .cell__credit--flat {
     border-bottom: none;
   }
@@ -308,11 +273,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     border: 1px solid rgb(255 165 2 / 0.3);
     padding: 2px 7px;
   }
-
-  /* ── Fallback ─────────────────────────────────────────────────────────────
-     No pin, no transform — an ordinary rail the reader swipes. Used on narrow
-     screens, short windows, without JS, and under reduced-motion.
-     ──────────────────────────────────────────────────────────────────────── */
 
   @media (max-width: 860px), (max-height: 640px) {
     .arail {
@@ -375,24 +335,11 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 </style>
 
 <script>
-  /**
-   * The rail's pin length is a measurement, not a guess.
-   *
-   * A fixed budget is wrong in both directions: with two pieces it reserves a
-   * screenful of scroll during which nothing moves, and with twenty it whips
-   * past. So the section is one viewport tall until the overflow is known, then
-   * grows by exactly that overflow — which also keeps the horizontal speed
-   * constant however many pieces the gallery holds.
-   */
   const init = () => {
     const rails = [...document.querySelectorAll<HTMLElement>('.arail')];
     if (!rails.length) return;
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    // These mirror the fallback media query in the stylesheet. Asking
-    // matchMedia rather than reading the frame's computed position matters:
-    // `[data-static]` makes that position static itself, so the test would
-    // latch on and the rail could never pin again after one narrow resize.
     const fallback = window.matchMedia('(max-width: 860px), (max-height: 640px)');
 
     const measure = () => {
@@ -418,8 +365,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 
     measure();
 
-    // init runs at module evaluation and again on `astro:page-load`; measure()
-    // is idempotent but the listeners must not stack up.
     if (!rails[0].dataset.bound) {
       rails[0].dataset.bound = '1';
       addEventListener('resize', measure, { passive: true });
@@ -427,8 +372,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
       fallback.addEventListener('change', measure);
     }
 
-    // Cell widths come from each image's aspect ratio, so the real overflow is
-    // only known once the artwork and the caption font have loaded.
     if (document.fonts?.ready) document.fonts.ready.then(measure);
     for (const img of document.querySelectorAll('.arail img')) {
       if (!(img as HTMLImageElement).complete) img.addEventListener('load', measure, { once: true });
@@ -440,8 +383,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 </script>
 
 <style is:global>
-  /* Without JS nothing writes --travel, so the track would sit at its start
-     with the rest of the pieces unreachable. Fall back to a scrollable rail. */
   html:not(.js) .arail {
     height: auto;
   }
