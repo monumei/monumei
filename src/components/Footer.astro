@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
   <div class="foot__inner rail">
     <div class="foot__mark">
       <p class="foot__wordmark">MONUMEI</p>
-      <p class="foot__line">Fullstack, cloud, and a drawing habit.</p>
+      <p class="foot__line">Software engineering, art, and rhythm games.</p>
     </div>
 
     <nav class="foot__col" aria-label="Sections">
@@ -164,10 +164,38 @@ const year = new Date().getFullYear();
   }
 
   @media (max-width: 760px) {
+    /* One column, centred. Left-aligned columns in a single stack leave the
+       whole right half of a phone empty and read as a layout that forgot to
+       collapse. */
     .foot__inner {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--s6);
       padding-block: var(--s7) var(--s6);
+      text-align: center;
+      justify-items: center;
+    }
+
+    .foot__line {
+      max-width: 30ch;
+      margin-inline: auto;
+    }
+
+    .foot__col {
+      width: 100%;
+      max-width: 22rem;
+    }
+
+    .foot__list {
+      align-items: center;
+    }
+
+    .foot__link {
+      justify-content: center;
+    }
+
+    .foot__colophon-inner {
+      justify-content: center;
+      text-align: center;
     }
   }
 </style>
