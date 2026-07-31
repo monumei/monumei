@@ -1,0 +1,573 @@
+---
+import { stamp, bay } from '../lib/format';
+import { CHANNELS } from '../lib/channels';
+
+/**
+ * The shell.
+ *
+ * A terminal that only prints canned strings is a costume. This one is a real
+ * way around the site: `go` and `open` reach every route, `search` runs over
+ * the log, the rack and the gallery, and Tab completes commands and arguments.
+ * Everything it prints comes from the collections rather than being typed in
+ * here twice — which is also why `skills` is gone. The stack was stated four
+ * times on this page; Systems says it once now, and the shell doesn't repeat it.
+ */
+interface Props {
+  posts: { title: string; date: Date; href: string }[];
+  units: { unit: number; title: string; tech: string; href: string }[];
+  art: { title: string; artist: string }[];
+}
+
+const { posts, units, art } = Astro.props;
+
+const data = {
+  posts: posts.map((p) => ({ title: p.title, date: stamp(p.date), href: p.href })),
+  units: units.map((u) => ({
+    addr: bay(u.unit),
+    title: u.title,
+    tech: u.tech,
+    href: u.href,
+  })),
+  art,
+  channels: CHANNELS.map((c) => ({
+    name: c.name.toLowerCase().replace(/\s*\/\s*x$/, ''),
+    handle: c.handle,
+    href: c.href ?? '',
+  })),
+  routes: [
+    { name: 'log', href: '/blog/' },
+    { name: 'work', href: '/work/' },
+    { name: 'art', href: '/art/' },
+    { name: 'home', href: '/' },
+  ],
+};
+---
+
+<div class="term panel panel--deep notch-l">
+  <div class="term__bar">
+    <span class="term__id data">
+      <span class="dot dot--pulse"></span>
+      monumei@shell — /home/monumei
+    </span>
+    <span class="term__hint data">type <b>help</b> · <b>Tab</b> completes</span>
+  </div>
+
+  <div class="term__screen" id="term-screen">
+    <div class="term__out" id="term-out" role="log" aria-live="polite" aria-label="Shell output"></div>
+
+    <form class="term__prompt" id="term-form" autocomplete="off">
+      <label class="sr-only" for="term-input">Shell command</label>
+      <span class="term__ps1 data" aria-hidden="true">monumei@shell:~$</span>
+      <input
+        class="term__input data"
+        id="term-input"
+        name="command"
+        type="text"
+        spellcheck="false"
+        autocapitalize="none"
+        autocorrect="off"
+      />
+    </form>
+  </div>
+</div>
+
+<script id="term-data" type="application/json" set:html={JSON.stringify(data)} is:inline></script>
+
+<style>
+  .term {
+    overflow: hidden;
+  }
+
+  .term__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding: 12px var(--s5);
+    background: var(--chassis-2);
+    border-block-end: 1px solid var(--seam);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+  }
+
+  .term__id {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    color: var(--ink-2);
+  }
+
+  .term__hint {
+    color: var(--ink-4);
+  }
+
+  .term__hint b {
+    color: var(--sig);
+    font-weight: 700;
+  }
+
+  .term__screen {
+    padding: var(--s5);
+    min-height: 340px;
+    max-height: 480px;
+    overflow-y: auto;
+    cursor: text;
+    font-family: var(--font-data);
+    font-size: 0.8125rem;
+    line-height: 1.85;
+    scrollbar-width: thin;
+  }
+
+  .term__out :global(.l) {
+    color: var(--ink-3);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .term__out :global(.l-echo) {
+    color: var(--ink);
+  }
+  .term__out :global(.l-led) {
+    color: var(--led-hot);
+  }
+  .term__out :global(.l-sig) {
+    color: var(--sig);
+  }
+  .term__out :global(.l-live) {
+    color: var(--live);
+  }
+  .term__out :global(.l-fault) {
+    color: var(--fault);
+  }
+  .term__out :global(.l-dim) {
+    color: var(--ink-4);
+  }
+
+  /* Results are links, so a search result can be followed with the keyboard
+     rather than retyping it as an `open` argument. They are laid out as their
+     own lines — an inline anchor would run consecutive results together into
+     one unreadable string. */
+  .term__out :global(a.l-link) {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    color: var(--led-hot);
+    border-bottom: 1px solid rgb(140 186 255 / 0.35);
+  }
+
+  .term__out :global(a.l-link:hover) {
+    color: var(--sig);
+    border-bottom-color: var(--sig);
+  }
+
+  .term__prompt {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+  }
+
+  .term__ps1 {
+    flex: none;
+    color: var(--led);
+  }
+
+  .term__input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    caret-color: var(--sig);
+    font-size: 0.8125rem;
+  }
+
+  @media (max-width: 560px) {
+    .term__screen {
+      font-size: 0.75rem;
+      padding: var(--s4);
+    }
+    .term__hint {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  type Line = { text: string; cls?: string; href?: string };
+
+  type TermData = {
+    posts: { title: string; date: string; href: string }[];
+    units: { addr: string; title: string; tech: string; href: string }[];
+    art: { title: string; artist: string }[];
+    channels: { name: string; handle: string; href: string }[];
+    routes: { name: string; href: string }[];
+  };
+
+  const init = () => {
+    const screen = document.getElementById('term-screen');
+    const out = document.getElementById('term-out');
+    const form = document.getElementById('term-form') as HTMLFormElement | null;
+    const input = document.getElementById('term-input') as HTMLInputElement | null;
+    const raw = document.getElementById('term-data')?.textContent;
+    if (!screen || !out || !form || !input || !raw) return;
+
+    // init runs both at module evaluation and on `astro:page-load`, so without
+    // this the shell binds twice and every command echoes twice.
+    if (form.dataset.bound) return;
+    form.dataset.bound = '1';
+
+    const data = JSON.parse(raw) as TermData;
+
+    const history: string[] = [];
+    let cursor = -1;
+
+    const write = (lines: Line[]) => {
+      const frag = document.createDocumentFragment();
+      for (const line of lines) {
+        const el = line.href ? document.createElement('a') : document.createElement('div');
+        if (line.href && el instanceof HTMLAnchorElement) {
+          el.href = line.href;
+          el.className = 'l l-link';
+        } else {
+          el.className = `l ${line.cls ?? ''}`.trim();
+        }
+        el.textContent = line.text;
+        frag.append(el);
+      }
+      out.append(frag);
+      screen.scrollTop = screen.scrollHeight;
+    };
+
+    const pad = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s.padEnd(n));
+
+    const commands: Record<string, { help: string; run: (arg: string) => Line[] }> = {
+      help: {
+        help: 'this list',
+        run: () => [
+          { text: 'available commands', cls: 'l-led' },
+          { text: '  whoami        identity readout' },
+          { text: '  log           latest entries' },
+          { text: '  work          selected projects' },
+          { text: '  art           gallery index' },
+          { text: '  contact       open channels' },
+          { text: '  funfacts      the things not on the CV' },
+          { text: '  search <q>    find anything on the site' },
+          { text: '  go <name>     open a section: log, work, art, home' },
+          { text: '  open <id>     open a project, e.g. open UNIT.01' },
+          { text: '  matcha        ???', cls: 'l-sig' },
+          { text: '  clear         wipe buffer' },
+          { text: '' },
+        ],
+      },
+
+      whoami: {
+        help: 'identity readout',
+        run: () => [
+          { text: 'monumei — lowkey software engineer', cls: 'l-echo' },
+          { text: 'principal SWE · fullstack · cloud · design' },
+          { text: '' },
+        ],
+      },
+
+      // The personal trivia used to sit on the first viewport, where it
+      // competed with what a visitor actually came to find out. It is better
+      // as something you go looking for.
+      funfacts: {
+        help: 'the things not on the CV',
+        run: () => [
+          { text: 'fun facts', cls: 'l-led' },
+          { text: '  15,000+ maimai plays' },
+          { text: '  runs on matcha latte and monster energy', cls: 'l-sig' },
+          { text: '  currently learning cloud engineering and graphics design' },
+          { text: '  draws, lowkey' },
+          { text: '' },
+        ],
+      },
+
+      log: {
+        help: 'latest entries',
+        run: () =>
+          data.posts.length
+            ? [
+                ...data.posts.map((p) => ({
+                  text: `${p.date}  ${p.title}`,
+                  href: p.href,
+                })),
+                { text: '' },
+              ]
+            : [
+                { text: 'log buffer empty', cls: 'l-dim' },
+                { text: 'add markdown to src/content/blog/', cls: 'l-sig' },
+                { text: '' },
+              ],
+      },
+
+      work: {
+        help: 'selected projects',
+        run: () =>
+          data.units.length
+            ? [
+                ...data.units.map((u) => ({
+                  text: `${u.addr}  ${pad(u.title, 28)} ${u.tech}`,
+                  href: u.href,
+                })),
+                { text: '' },
+              ]
+            : [
+                { text: 'no modules installed', cls: 'l-dim' },
+                { text: 'add markdown to src/content/work/', cls: 'l-sig' },
+                { text: '' },
+              ],
+      },
+
+      art: {
+        help: 'gallery index',
+        run: () =>
+          data.art.length
+            ? [
+                ...data.art.map((a) => ({
+                  text: a.artist ? `${pad(a.title, 30)} commissioned from ${a.artist}` : a.title,
+                })),
+                { text: 'open the gallery: go art', cls: 'l-dim' },
+                { text: '' },
+              ]
+            : [
+                { text: 'gallery empty', cls: 'l-dim' },
+                { text: 'add markdown to src/content/art/', cls: 'l-sig' },
+                { text: '' },
+              ],
+      },
+
+      contact: {
+        help: 'open channels',
+        run: () => [
+          ...data.channels.map((c) =>
+            c.href
+              ? { text: `${pad(c.name, 10)}${c.handle}`, href: c.href }
+              : { text: `${pad(c.name, 10)}${c.handle}`, cls: 'l-led' }
+          ),
+          { text: '' },
+        ],
+      },
+
+      matcha: {
+        help: '???',
+        run: () => [
+          { text: 'brewing... ████████████ 100%', cls: 'l-live' },
+          { text: 'matcha latte acquired. monster energy on standby.', cls: 'l-sig' },
+          { text: '' },
+        ],
+      },
+
+      search: {
+        help: 'find anything on the site',
+        run: (arg) => {
+          const q = arg.trim().toLowerCase();
+          if (!q) return [{ text: 'usage: search <term>', cls: 'l-dim' }, { text: '' }];
+
+          const hits: Line[] = [];
+
+          for (const p of data.posts) {
+            if (p.title.toLowerCase().includes(q)) {
+              hits.push({ text: `log    ${p.date}  ${p.title}`, href: p.href });
+            }
+          }
+          for (const u of data.units) {
+            if (`${u.title} ${u.tech}`.toLowerCase().includes(q)) {
+              hits.push({ text: `work   ${u.addr}  ${u.title}`, href: u.href });
+            }
+          }
+          for (const a of data.art) {
+            if (`${a.title} ${a.artist}`.toLowerCase().includes(q)) {
+              hits.push({ text: `art    ${a.title}`, href: '/art/' });
+            }
+          }
+
+          return hits.length
+            ? [{ text: `${hits.length} result${hits.length === 1 ? '' : 's'}`, cls: 'l-led' }, ...hits, { text: '' }]
+            : [
+                { text: `no matches for "${q}"`, cls: 'l-dim' },
+                { text: 'search covers entry titles, project names and artwork', cls: 'l-dim' },
+                { text: '' },
+              ];
+        },
+      },
+
+      go: {
+        help: 'open a section',
+        run: (arg) => {
+          const name = arg.trim().toLowerCase();
+          const names = data.routes.map((r) => r.name).join(', ');
+          if (!name) return [{ text: `usage: go <${names}>`, cls: 'l-dim' }, { text: '' }];
+
+          const route = data.routes.find((r) => r.name === name);
+          if (route) {
+            navigate(route.href, `opening /${name === 'home' ? '' : name}`);
+            return [];
+          }
+
+          // A section on this page is a scroll target rather than a route.
+          const section = document.getElementById(name);
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return [{ text: `jumping to ${name}`, cls: 'l-live' }, { text: '' }];
+          }
+
+          return [
+            { text: `no such section: ${name}`, cls: 'l-fault' },
+            { text: `try: ${names}`, cls: 'l-dim' },
+            { text: '' },
+          ];
+        },
+      },
+
+      open: {
+        help: 'open a project by id',
+        run: (arg) => {
+          const id = arg.trim().toUpperCase();
+          if (!id) {
+            return [{ text: 'usage: open <id>   e.g. open UNIT.01', cls: 'l-dim' }, { text: '' }];
+          }
+
+          const unit = data.units.find((u) => u.addr === id);
+          if (unit) {
+            navigate(unit.href, `opening ${unit.addr} — ${unit.title}`);
+            return [];
+          }
+
+          // `open log` used to work, so it keeps working.
+          return commands.go.run(arg);
+        },
+      },
+    };
+
+    const navigate = (href: string, message: string) => {
+      write([{ text: message, cls: 'l-live' }]);
+      setTimeout(() => {
+        window.location.href = href;
+      }, 380);
+    };
+
+    const run = (rawInput: string) => {
+      const cmd = rawInput.trim();
+      write([{ text: `monumei@shell:~$ ${cmd}`, cls: 'l-echo' }]);
+      if (!cmd) return;
+
+      const [head, ...rest] = cmd.split(/\s+/);
+      const name = head.toLowerCase();
+      const arg = rest.join(' ');
+
+      if (name === 'clear') {
+        out.replaceChildren();
+        return;
+      }
+
+      // Kept because muscle memory reaches for them.
+      const alias: Record<string, string> = {
+        blog: 'log',
+        projects: 'work',
+        ls: 'help',
+        skills: 'whoami',
+        gallery: 'art',
+        cd: 'go',
+        fun: 'funfacts',
+        maimai: 'funfacts',
+      };
+
+      const handler = commands[alias[name] ?? name];
+      if (handler) {
+        write(handler.run(arg));
+        return;
+      }
+
+      write([
+        { text: `command not found: ${name}`, cls: 'l-fault' },
+        { text: 'type "help" for available commands', cls: 'l-dim' },
+        { text: '' },
+      ]);
+    };
+
+    // ── Completion ───────────────────────────────────────────────────────
+    // Tab completes the command, and for the commands that take a known set
+    // of arguments, the argument too.
+
+    const argsFor = (name: string): string[] => {
+      if (name === 'go' || name === 'cd') return data.routes.map((r) => r.name);
+      if (name === 'open') return data.units.map((u) => u.addr);
+      return [];
+    };
+
+    const complete = () => {
+      const value = input.value;
+      const parts = value.split(/\s+/);
+      const typingArg = parts.length > 1;
+      const stem = (parts[parts.length - 1] ?? '').toLowerCase();
+      const pool = typingArg ? argsFor(parts[0].toLowerCase()) : Object.keys(commands);
+
+      const matches = pool.filter((c) => c.toLowerCase().startsWith(stem));
+      if (!matches.length) return;
+
+      if (matches.length === 1) {
+        parts[parts.length - 1] = matches[0];
+        input.value = parts.join(' ') + ' ';
+        return;
+      }
+
+      // Several candidates: fill in as far as they agree, then list them.
+      let shared = matches[0];
+      for (const m of matches) {
+        while (!m.toLowerCase().startsWith(shared.toLowerCase())) {
+          shared = shared.slice(0, -1);
+        }
+      }
+      parts[parts.length - 1] = shared;
+      input.value = parts.join(' ');
+      write([{ text: matches.join('   '), cls: 'l-dim' }]);
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const value = input.value;
+      if (value.trim()) {
+        history.push(value);
+        cursor = history.length;
+      }
+      input.value = '';
+      run(value);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        complete();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!history.length) return;
+        cursor = Math.max(0, cursor - 1);
+        input.value = history[cursor] ?? '';
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cursor = Math.min(history.length, cursor + 1);
+        input.value = history[cursor] ?? '';
+      }
+    });
+
+    // Clicking anywhere on the screen focuses the prompt, the way a real
+    // terminal pane behaves — but never steals focus from a selection, and
+    // never from a result link the reader is trying to click.
+    screen.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) return;
+      if (!window.getSelection()?.toString()) input.focus();
+    });
+
+    write([
+      { text: 'monumei.com', cls: 'l-led' },
+      { text: 'type "help" for available commands', cls: 'l-dim' },
+      { text: '' },
+    ]);
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

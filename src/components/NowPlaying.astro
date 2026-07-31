@@ -1,0 +1,139 @@
+---
+/**
+ * Now playing — the one live readout on the site.
+ *
+ * It used to sit inside the Loadout act, which was removed: the tech list was
+ * stated four separate times on the homepage and that repetition was the
+ * page's biggest tell. This panel survived the cut because it is the only
+ * thing on the page reporting something that is actually changing.
+ *
+ * The embed host goes down regularly, so a failure prints a plate rather than
+ * a broken-image glyph.
+ */
+const spotify =
+  'https://spotify-github-profile.kittinanx.com/api/view?uid=o8930qm21yhjrgc1u6sk8jz54&cover_image=true&theme=natemoo-re&show_offline=true&background_color=121212&interchange=false&bar_color=53b14f&bar_color_cover=false';
+---
+
+<section class="np" aria-labelledby="np-h">
+  <div class="np__head">
+    <h3 class="np__h stencil" id="np-h">Now playing</h3>
+    <span class="np__tag data">Spotify</span>
+  </div>
+
+  <a
+    class="np__frame"
+    href="https://open.spotify.com/user/o8930qm21yhjrgc1u6sk8jz54"
+    rel="noopener"
+  >
+    <img
+      src={spotify}
+      alt="What Monumei is currently listening to on Spotify"
+      loading="lazy"
+      decoding="async"
+      data-embed
+    />
+    <span class="np__fallback data" hidden>Not connected right now</span>
+  </a>
+</section>
+
+<style>
+  .np {
+    display: grid;
+    grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s5);
+    margin-block-start: var(--s7);
+    padding-block-start: var(--s5);
+    border-block-start: 1px solid var(--seam);
+  }
+
+  .np__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+  }
+
+  .np__h {
+    color: var(--ink-4);
+  }
+
+  .np__tag {
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .np__frame {
+    display: block;
+    position: relative;
+    min-height: 88px;
+    max-width: 420px;
+    background: var(--chassis-0);
+    border: 1px solid var(--seam);
+    padding: var(--s3);
+    transition: border-color var(--t-fast) var(--ease-snap);
+  }
+
+  .np__frame:hover {
+    border-color: rgb(46 123 255 / 0.45);
+  }
+
+  .np__frame img {
+    width: 100%;
+    height: auto;
+  }
+
+  .np__fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  .np__fallback[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .np {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s4);
+    }
+
+    .np__head {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+  }
+</style>
+
+<script>
+  // Swap in the printed plate rather than leaving a broken-image glyph — and
+  // check images that already failed before this script parsed, which a plain
+  // error listener would miss.
+  const init = () => {
+    const fail = (img: HTMLImageElement) => {
+      img.hidden = true;
+      const fallback = img.parentElement?.querySelector<HTMLElement>('.np__fallback');
+      if (fallback) fallback.hidden = false;
+    };
+
+    for (const img of document.querySelectorAll<HTMLImageElement>('img[data-embed]')) {
+      // init runs at module evaluation and again on `astro:page-load`.
+      if (img.dataset.bound) continue;
+      img.dataset.bound = '1';
+
+      img.addEventListener('error', () => fail(img));
+      if (img.complete && img.naturalWidth === 0) fail(img);
+    }
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
