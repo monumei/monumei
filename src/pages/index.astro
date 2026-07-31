@@ -1,0 +1,180 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Systems from '../components/Systems.astro';
+import ArtRail from '../components/ArtRail.astro';
+import ArtistCard from '../components/ArtistCard.astro';
+import Act from '../components/Act.astro';
+import ModulePlate from '../components/ModulePlate.astro';
+import LogEntry from '../components/LogEntry.astro';
+import WorkUnit from '../components/WorkUnit.astro';
+import Terminal from '../components/Terminal.astro';
+import Channels from '../components/Channels.astro';
+import NowPlaying from '../components/NowPlaying.astro';
+import EmptyBay from '../components/EmptyBay.astro';
+import { getPosts } from '../lib/log';
+import { getArt, artistCounts } from '../lib/art';
+
+const posts = await getPosts();
+
+const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.unit - b.data.unit
+);
+
+// The rail carries the gallery itself, so it follows the collection rather
+// than being pinned to one import. Featured pieces lead.
+const art = (await getArt()).sort(
+  (a, b) => Number(b.data.featured) - Number(a.data.featured)
+);
+const artCounts = artistCounts(art);
+
+// The homepage shows a curated few; the full lists live on their own pages.
+// That is what keeps each pinned act inside one viewport as the collections grow.
+const recent = posts.slice(0, 3);
+const rack = units.slice(0, 3);
+
+const termPosts = posts.map((p) => ({
+  title: p.data.title,
+  date: p.data.date,
+  href: `/blog/${p.id}/`,
+}));
+
+const termUnits = units.map((u) => ({
+  unit: u.data.unit,
+  title: u.data.title,
+  tech: u.data.tech,
+  href: `/work/${u.id}/`,
+}));
+
+const termArt = art.map((a) => ({
+  title: a.data.title,
+  artist: a.data.commissioned ? (a.data.artist ?? 'credit pending') : '',
+}));
+---
+
+<Base
+  title="Monumei — lowkey software engineer"
+  description="Portfolio and writing log of Monumei: principal software engineer working across fullstack web, cloud, and design."
+  location="ROOT"
+>
+  <Hero />
+  <Systems />
+
+  <Act id="log" labelledby="log-title" budget={70} loc="LOG">
+    <ModulePlate
+      title="The Log"
+      meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}` : undefined}
+      id="log-title"
+    />
+
+    {
+      recent.length ? (
+        <div class="deck ledger">
+          {recent.map((p) => (
+            <LogEntry
+              href={`/blog/${p.id}/`}
+              title={p.data.title}
+              summary={p.data.summary}
+              channel={p.data.channel}
+              date={p.data.date}
+              sample={p.data.sample}
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyBay
+          label="Log buffer empty"
+          hint="No entries written yet. Drop a markdown file in the blog collection and it appears here."
+          path="src/content/blog/*.md"
+        />
+      )
+    }
+
+    {
+      posts.length > 0 && (
+        <p class="act__more rise rise--late">
+          <a class="btn btn--ghost" href="/blog/">
+            {posts.length > recent.length ? `All ${posts.length} entries` : 'Open the log'}
+          </a>
+        </p>
+      )
+    }
+  </Act>
+
+  <Act id="rack" labelledby="rack-title" budget={70} loc="WORK">
+    <ModulePlate
+      title="Selected Work"
+      meta={units.length ? `${units.length} ${units.length === 1 ? 'project' : 'projects'}` : undefined}
+      id="rack-title"
+    />
+
+    {
+      rack.length ? (
+        <div class="deck deck--alt grid grid--work">
+          {rack.map((u) => (
+            <WorkUnit
+              href={`/work/${u.id}/`}
+              unit={u.data.unit}
+              title={u.data.title}
+              summary={u.data.summary}
+              tech={u.data.tech}
+              status={u.data.status}
+              stack={u.data.stack}
+              sample={u.data.sample}
+            />
+          ))}
+        </div>
+      ) : (
+        <EmptyBay
+          label="No modules installed"
+          hint="The rack is empty. Add a markdown file per project and each one racks up as its own bay."
+          path="src/content/work/*.md"
+        />
+      )
+    }
+
+    {
+      units.length > 0 && (
+        <p class="act__more rise rise--late">
+          <a class="btn btn--ghost" href="/work/">
+            {units.length > rack.length ? `All ${units.length} projects` : 'Open the rack'}
+          </a>
+        </p>
+      )
+    }
+  </Act>
+
+  {art.length > 0 && <ArtRail pieces={art} counts={artCounts} />}
+
+  <Act id="shell" labelledby="shell-title" budget={60} loc="SHELL">
+    <ModulePlate title="Shell" meta="type help" id="shell-title" />
+    <div class="power">
+      <Terminal posts={termPosts} units={termUnits} art={termArt} />
+    </div>
+  </Act>
+
+  <Act id="channels" labelledby="channels-title" budget={50} loc="CONTACT">
+    <ModulePlate title="Channels" id="channels-title" />
+    <Channels />
+    <NowPlaying />
+  </Act>
+
+  {/* Serves the credit controls in the art rail above. */}
+  {art.length > 0 && <ArtistCard />}
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    gap: var(--s4);
+  }
+
+  .grid--work {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+
+  .act__more {
+    margin-block-start: var(--s5);
+  }
+</style>

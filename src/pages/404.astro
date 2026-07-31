@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="404 — no such module"
+  description="That address doesn't resolve to anything on this chassis."
+  location="FAULT"
+>
+  <section class="fault rail">
+    <div class="fault__hazard" aria-hidden="true"></div>
+
+    <p class="fault__code data">ERR 404 / ADDRESS UNRESOLVED</p>
+    <h1 class="fault__title">No such module</h1>
+    <p class="fault__body">
+      Nothing is racked at that address. It may have been renamed, or it was never
+      installed in the first place.
+    </p>
+
+    <div class="fault__actions">
+      <a class="btn btn--primary" href="/">Back to root</a>
+      <a class="btn btn--ghost" href="/blog/">The Log</a>
+    </div>
+
+    <div class="fault__hazard" aria-hidden="true"></div>
+  </section>
+</Base>
+
+<style>
+  .fault {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s4);
+    padding-block: clamp(150px, 24vh, 240px) var(--s9);
+    max-width: 760px;
+  }
+
+  .fault__hazard {
+    align-self: stretch;
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--fault) 0 6px,
+      transparent 6px 14px
+    );
+    opacity: 0.4;
+  }
+
+  .fault__code {
+    margin-block-start: var(--s5);
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    color: var(--fault);
+  }
+
+  .fault__title {
+    font-size: clamp(2.4rem, 8vw, 4.6rem);
+    font-weight: 700;
+    line-height: 0.98;
+  }
+
+  .fault__body {
+    max-width: 46ch;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--ink-3);
+  }
+
+  .fault__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    margin-block: var(--s4) var(--s7);
+  }
+</style>
