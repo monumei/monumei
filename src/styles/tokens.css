@@ -1,0 +1,121 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   monumei.com — design tokens
+   World: the site as a piece of gaming hardware.
+
+   Two references, fused at the material level rather than the "glow" level:
+
+   RGX 11z Pro (blue variant) — anodized graphite chassis, machined panel seams,
+   frosted acrylic windows that DIFFUSE light rather than emit it, exposed board
+   traces, and a product-SKU typographic system.
+
+   Arknights: Endfield — industrial signage printed ON metal. Zero corner radius,
+   chamfered notches, stencil numerals, hazard stripes, corner brackets, and a
+   signal-yellow that means "read this" rather than "look at me".
+
+   The key correction against the usual dark-portfolio default: the chassis is
+   NEUTRAL graphite (0% saturation). Blue is light, not metal. If the panels are
+   blue-tinted there is nothing left for the LED to do.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Chassis: neutral anodized graphite ─────────────────────────────────── */
+  --void: #08090b;
+  --chassis-0: #0c0e11;
+  --chassis-1: #131519;
+  --chassis-2: #191c21;
+  --chassis-3: #22262c;
+  --chassis-4: #2c3138;
+
+  /* ── Seams: machined panel edges ────────────────────────────────────────── */
+  --seam: rgb(255 255 255 / 0.07);
+  --seam-strong: rgb(255 255 255 / 0.14);
+  --seam-bright: rgb(255 255 255 / 0.26);
+
+  /* ── LED: the RGX blue variant, seen through frosted acrylic ────────────── */
+  --led: #2e7bff;
+  --led-hot: #8cbaff;
+  --led-deep: #0a3fa0;
+  --led-wash: rgb(46 123 255 / 0.13);
+  --led-wash-soft: rgb(46 123 255 / 0.06);
+
+  /* ── Signage: Endfield signal yellow. Printed, not lit. ─────────────────── */
+  --sig: #ffd429;
+  --sig-deep: #c28c00;
+  --sig-wash: rgb(255 212 41 / 0.11);
+
+  /* ── Status ─────────────────────────────────────────────────────────────── */
+  --live: #cbff40;
+  --warn: #ffa502;
+  --fault: #ff4757;
+
+  /* ── Ink ────────────────────────────────────────────────────────────────── */
+  --ink: #f0f2f5;
+  --ink-2: #b9bfc8;
+  --ink-3: #8a929d;
+  --ink-4: #646c78;
+
+  /* ── Type ───────────────────────────────────────────────────────────────── */
+  --font-display: 'Saira Variable', 'Saira', system-ui, sans-serif;
+  --font-body: 'Chakra Petch', system-ui, sans-serif;
+  --font-data: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  --track-plate: 0.24em;
+  --track-display: -0.035em;
+
+  /* ── Chamfer: the Endfield notch, one system, three sizes ───────────────── */
+  --notch-s: 8px;
+  --notch-m: 14px;
+  --notch-l: 22px;
+
+  /* ── Space ──────────────────────────────────────────────────────────────── */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+  --s10: 140px;
+
+  --gutter: clamp(20px, 4vw, 56px);
+  --rail: 1360px;
+  --measure: 68ch;
+
+  /* ── Motion ─────────────────────────────────────────────────────────────── */
+  --ease-seat: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.4, 0, 0.1, 1);
+  --ease-power: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --t-instant: 90ms;
+  --t-fast: 180ms;
+  --t-base: 320ms;
+  --t-slow: 620ms;
+  --t-boot: 1100ms;
+
+  /* ── Depth: real offset + blur. No zero-offset halos as "depth". ────────── */
+  --lift-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --lift-2: 0 6px 16px -4px rgb(0 0 0 / 0.55), 0 2px 4px rgb(0 0 0 / 0.35);
+  --lift-3: 0 18px 44px -12px rgb(0 0 0 / 0.7), 0 4px 10px rgb(0 0 0 / 0.4);
+
+  /* Emission is separate from depth — this is light, not a shadow. */
+  --emit-led: 0 0 28px -4px rgb(46 123 255 / 0.5);
+  --emit-sig: 0 0 24px -6px rgb(255 212 41 / 0.42);
+
+  --z-grain: 60;
+  --z-nav: 70;
+  --z-boot: 90;
+}
+
+/* Reduced-motion: hold every animated property at its finished state. The
+   content is visible by default, so nothing here is load-bearing. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-instant: 1ms;
+    --t-fast: 1ms;
+    --t-base: 1ms;
+    --t-slow: 1ms;
+    --t-boot: 1ms;
+  }
+}
