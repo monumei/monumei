@@ -22,15 +22,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
 }));
 ---
 
-<!--
-  Key art, built as a pinned stage.
-
-  Layer order is the whole idea: sky, far rain, WORDMARK, character, near rain.
-  The name sits behind the figure and is partly occluded by them — the way a
-  game splash treats its logo — so the two read as one composed image rather
-  than a title with a picture next to it. Every layer moves at its own rate
-  against `--p`, so scrolling separates them into depth.
--->
 <section class="hero" data-stage="pin" aria-labelledby="hero-title">
   <div class="hero__frame">
     <div class="scene" aria-hidden="true">
@@ -66,21 +57,12 @@ const bokeh = Array.from({ length: 46 }, () => ({
       <div class="scene__rain l-mid"><Rain depth="mid" /></div>
     </div>
 
-    <!-- The name, behind the figure -->
     <div class="word l-word" aria-hidden="true">
       <span class="word__text">MONU<span class="word__lit">MEI</span></span>
     </div>
 
-    <!--
-      Scrim for the copy. It sits here — full-bleed, and *behind* the figure —
-      rather than on .hero__ui, which is a .rail and so clipped the gradient to
-      1360px: its right edge cut a visible vertical seam straight across the
-      artwork. Behind the figure it also stops dimming the character it is
-      supposed to be sitting under.
-    -->
     <div class="hero__scrim l-scrim" aria-hidden="true"></div>
 
-    <!-- The figure, in front of the name -->
     <div class="figure l-figure">
       <Image
         src={hero}
@@ -98,18 +80,17 @@ const bokeh = Array.from({ length: 46 }, () => ({
       <div class="scene__film"></div>
     </div>
 
-    <!-- Copy sits on the chassis, over the scene -->
     <div class="hero__ui rail">
-      <h1 class="sr-only" id="hero-title">Monumei — lowkey software engineer</h1>
+      <h1 class="sr-only" id="hero-title">Monumei — Principal Software Engineer</h1>
 
       <div class="hero__copy l-copy">
         <p class="hero__role">
-          <span class="hero__role-main">Lowkey software engineer</span>
+          <span class="hero__role-main">Principal Software Engineer</span>
         </p>
 
         <p class="hero__blurb">
-          I build web things and design the pixels around them. Fullstack, cloud, and
-          whatever the current obsession is.
+          Software engineering — data, product, solutions, pick a lane depending on
+          the week. Everything else is art and rhythm games.
         </p>
 
         <div class="hero__actions">

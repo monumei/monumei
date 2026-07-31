@@ -35,9 +35,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@m0numei" />
 
-    {/* Cross-page navigation as a cut rather than a reload. The persistent
-        chrome — spine, grain, nav — survives the transition, which is what
-        makes the site read as one object instead of five documents. */}
     <ClientRouter />
 
     <script is:inline>
@@ -46,39 +43,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
 
   <body>
-    <!--
-      DIRECTION CONTRACT — monumei.com
-
-      THESIS: This portfolio is a piece of gaming hardware, not a page about a
-      person. It refuses the dark-portfolio default of near-black plus one neon
-      accent plus glowing edges.
-
-      OWN-WORLD: Neutral anodized graphite chassis (0% saturation) with machined
-      seams and chamfered Endfield notches. Blue is LIGHT — diffused through
-      frosted acrylic in recessed LED channels — never tinted into the metal.
-      Signal yellow is PRINTED signage. Saira display, Chakra Petch body,
-      JetBrains Mono for readouts only.
-
-      STORY: One continuous camera move through a machine. Motion is SCRUBBED
-      against scroll position via a single `--p` per stage — never fired once on
-      entry — so pinned frames hold while their layers separate at different
-      rates. An LED spine tracks whole-document progress across every act.
-
-      FIRST VIEWPORT: Full-bleed chassis. Oversized MONUMEI wordmark left, LED
-      spine filling down the left edge, spec plate rising as the wordmark
-      recedes and defocuses, primary action on the plate's baseline.
-
-      STRUCTURE: Each fact is stated once. Systems owns what Monumei does; the
-      Log, the rack and the gallery are real routes with real collections
-      behind them, not homepage anchors. Nothing is repeated for volume.
-
-      FORM: Brief-pinned world (RGX 11z Pro blue + Arknights Endfield). No
-      concept roll — a pinned direction beats the roll.
-
-      FINISH: unreviewed and undocumented is unfinished; this build ends with the
-      finish review, the verdict, and DESIGN.md
-    -->
-
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="chassis-grain" aria-hidden="true" transition:persist></div>
     <div class="grain" aria-hidden="true" transition:persist></div>
