@@ -17,7 +17,9 @@ const links = [
 <header class="isle" id="isle">
   <nav class="isle__pill" aria-label="Primary">
     <a class="isle__mark" href="/" aria-label="Monumei — home">
-      <span class="isle__led" aria-hidden="true"></span>
+      <svg class="isle__led" viewBox="0 0 32 30" aria-hidden="true" focusable="false">
+        <path d="M16 28.5 4.2 17.3C1.6 14.8 0 12.2 0 8.9 0 3.8 3.9 0 8.8 0c2.8 0 5.4 1.3 7.2 3.5C17.8 1.3 20.4 0 23.2 0 28.1 0 32 3.8 32 8.9c0 3.3-1.6 5.9-4.2 8.4L16 28.5Z" />
+      </svg>
       <span class="isle__name">MONUMEI</span>
     </a>
 
@@ -98,18 +100,19 @@ const links = [
   }
 
   .isle__led {
-    width: 9px;
-    height: 9px;
+    width: 12px;
+    height: 11px;
     flex: none;
-    background: var(--led);
-    box-shadow: 0 0 10px var(--led);
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-    transition: background var(--t-fast) var(--ease-snap);
+    fill: var(--led);
+    filter: drop-shadow(0 0 8px var(--led));
+    transition:
+      fill var(--t-fast) var(--ease-snap),
+      filter var(--t-fast) var(--ease-snap);
   }
 
   .isle__mark:hover .isle__led {
-    background: var(--sig);
-    box-shadow: 0 0 10px var(--sig);
+    fill: var(--sig);
+    filter: drop-shadow(0 0 8px var(--sig));
   }
 
   .isle__name {

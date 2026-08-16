@@ -48,6 +48,22 @@ const { id, labelledby, budget = 80, loc, class: cls } = Astro.props;
 
   @media (max-width: 860px), (max-height: 700px) {
     .act {
+      height: calc(100svh + min(var(--budget, 80vh), 46vh));
+    }
+
+    .act__frame {
+      position: sticky;
+      height: 100svh;
+      overflow: hidden;
+    }
+
+    .act__inner {
+      padding-block: clamp(72px, 12svh, 104px) clamp(48px, 9svh, 76px);
+    }
+  }
+
+  @media (max-height: 620px) {
+    .act {
       height: auto;
     }
 
@@ -55,10 +71,6 @@ const { id, labelledby, budget = 80, loc, class: cls } = Astro.props;
       position: static;
       height: auto;
       overflow: visible;
-    }
-
-    .act__inner {
-      padding-block: var(--s8) var(--s7);
     }
   }
 </style>

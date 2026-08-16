@@ -270,6 +270,23 @@ const lines = [
 
   @media (max-width: 860px), (max-height: 700px) {
     .sys {
+      height: 240svh;
+    }
+
+    .sys__frame {
+      position: sticky;
+      height: 100svh;
+      padding-block: clamp(72px, 12svh, var(--s9));
+      overflow: clip;
+    }
+
+    .sys__item {
+      gap: var(--s3);
+    }
+  }
+
+  @media (max-height: 620px) {
+    .sys {
       height: auto;
     }
 
@@ -277,7 +294,6 @@ const lines = [
       position: static;
       height: auto;
       padding-block: var(--s9);
-      overflow: clip;
     }
 
     .sys__item {

@@ -417,13 +417,12 @@ const bokeh = Array.from({ length: 46 }, () => ({
 
   @media (max-width: 860px), (max-height: 700px) {
     .hero {
-      height: auto;
+      height: 210svh;
     }
 
     .hero__frame {
-      position: static;
-      height: auto;
-      min-height: 100svh;
+      position: sticky;
+      height: 100svh;
       overflow: clip;
     }
 
@@ -452,6 +451,27 @@ const bokeh = Array.from({ length: 46 }, () => ({
     .word {
       align-items: flex-start;
       padding-block-start: 18vh;
+    }
+
+    .l-sky,
+    .l-far,
+    .l-mid,
+    .l-near,
+    .l-word,
+    .l-figure,
+    .l-copy {
+      filter: none;
+    }
+  }
+
+  @media (max-height: 620px) {
+    .hero {
+      height: auto;
+    }
+
+    .hero__frame {
+      position: static;
+      min-height: 100svh;
     }
 
     .l-sky,

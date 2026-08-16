@@ -276,6 +276,41 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 
   @media (max-width: 860px), (max-height: 640px) {
     .arail {
+      --budget: 120vh;
+      --cell-h: clamp(240px, 58svh, 420px);
+      height: calc(100svh + var(--budget));
+    }
+
+    .arail__frame {
+      position: sticky;
+      height: 100svh;
+      padding-block: clamp(68px, 10svh, var(--s8));
+      overflow: hidden;
+    }
+
+    .arail__viewport {
+      overflow: hidden;
+      scroll-snap-type: none;
+      overscroll-behavior-x: auto;
+      scrollbar-width: none;
+      padding-block-end: var(--s2);
+    }
+
+    .arail__viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .arail__track {
+      transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
+    }
+
+    .cell {
+      scroll-snap-align: none;
+    }
+  }
+
+  @media (max-height: 620px) {
+    .arail {
       height: auto;
     }
 
@@ -290,12 +325,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       overscroll-behavior-x: contain;
-      scrollbar-width: none;
-      padding-block-end: var(--s2);
-    }
-
-    .arail__viewport::-webkit-scrollbar {
-      display: none;
     }
 
     .arail__track {
