@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base
-  title="404 — no such module"
+  title="404 | no such module"
   description="That address doesn't resolve to anything on this chassis."
   location="FAULT"
 >
@@ -13,13 +13,12 @@ import Base from '../layouts/Base.astro';
     <p class="fault__code data">ERR 404 / ADDRESS UNRESOLVED</p>
     <h1 class="fault__title">No such module</h1>
     <p class="fault__body">
-      Nothing is racked at that address. It may have been renamed, or it was never
-      installed in the first place.
+      Nothing lives at this address. The page may have moved, or the URL may be wrong.
     </p>
 
     <div class="fault__actions">
       <a class="btn btn--primary" href="/">Back to root</a>
-      <a class="btn btn--ghost" href="/blog/">The Log</a>
+      <a class="btn btn--ghost" href="/blog/">Blog</a>
     </div>
 
     <div class="fault__hazard" aria-hidden="true"></div>

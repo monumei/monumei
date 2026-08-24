@@ -11,8 +11,8 @@ const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
 ---
 
 <Base
-  title="Selected Work — Monumei"
-  description="Projects by Monumei."
+  title="Selected Work | Monumei"
+  description="Software projects built across product, data, infrastructure, and interface work."
   location="WORK"
 >
   <div class="page rail">
@@ -40,7 +40,7 @@ const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
       ) : (
         <EmptyBay
           label="No modules installed"
-          hint="The rack is empty. Add a markdown file per project and each one racks up as its own bay."
+          hint="No projects yet. Add one Markdown file for each project."
           path="src/content/work/*.md"
         />
       )

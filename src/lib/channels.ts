@@ -31,7 +31,7 @@ export const CHANNELS: Channel[] = [
 ];
 
 export const ROUTES = [
-  { href: '/blog/', label: 'The Log', note: 'Writing, notes, conventions' },
+  { href: '/blog/', label: 'Blog', note: 'Engineering notes and other writing' },
   { href: '/work/', label: 'Work', note: 'Projects and what they run on' },
   { href: '/art/', label: 'Art', note: 'Drawings and commissions' },
 ];

@@ -17,10 +17,10 @@ const { Content } = await render(post);
 const { newer, older } = neighbours(await getPosts(), post.id);
 ---
 
-<Base title={`${post.data.title} — Monumei`} description={post.data.summary} location="LOG">
+<Base title={`${post.data.title} | Monumei`} description={post.data.summary} location="LOG">
   <article class="post rail rail--read">
     <div class="post__head">
-      <a class="post__back data" href="/blog/">← The Log</a>
+      <a class="post__back data" href="/blog/">← Back to Blog</a>
 
       <div class="post__meta data">
         <a class="post__channel" href={`/blog/channel/${post.data.channel.toLowerCase()}/`}>
@@ -65,9 +65,9 @@ const { newer, older } = neighbours(await getPosts(), post.id);
         <aside class="notice" role="note">
           <span class="notice__tag stencil">Sample entry</span>
           <p class="notice__body">
-            This post ships with the site as a formatting reference — it is not Monumei's
-            writing. Delete <code>src/content/blog/{post.id}.md</code> or remove its
-            <code>sample: true</code> flag once you replace the content.
+            This formatting sample does not contain Monumei's writing. Delete
+            <code>src/content/blog/{post.id}.md</code> or remove its
+            <code>sample: true</code> flag after replacing the content.
           </p>
         </aside>
       )
@@ -104,7 +104,7 @@ const { newer, older } = neighbours(await getPosts(), post.id);
             ) : (
               <span class="around__item around__item--right around__item--end">
                 <span class="around__dir data">Older</span>
-                <span class="around__none">Start of the log.</span>
+                <span class="around__none">Start of the blog.</span>
               </span>
             )}
           </div>

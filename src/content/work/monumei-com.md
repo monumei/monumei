@@ -1,6 +1,6 @@
 ---
 title: monumei.com
-summary: This site — a static Astro build with a hardware-inspired interface and zero runtime JavaScript dependencies.
+summary: A static Astro portfolio with a hardware-inspired interface, content collections, and no client framework.
 unit: 1
 tech: Astro
 stack: [Astro, TypeScript, Vanilla CSS, Bun]
@@ -9,41 +9,29 @@ year: '2026'
 repo: https://github.com/monumei/monumei
 ---
 
-The portfolio you're reading. Built as a static Astro site with vanilla CSS and no
-runtime framework, because a personal site that takes a second to become interactive
-is a personal site nobody scrolls.
+The site you are reading runs as a static Astro build with vanilla CSS. Astro ships
+small scripts for the interactions that need them, while the main pages render without
+a client framework.
 
-## The idea
+## Visual system
 
-Two visual references drive the whole interface: the **RGX 11z Pro** weapon skin line
-from VALORANT, and the UI language of **Arknights: Endfield**.
+VALORANT's RGX 11z Pro line and Arknights: Endfield shaped the interface. RGX supplied
+the graphite chassis, panel seams, and diffused blue light. Endfield supplied the
+printed labels, square geometry, and signal yellow.
 
-The easy reading of both is "dark page, neon glow". That's not what either one is
-actually doing. RGX is industrial product design — anodized graphite, machined panel
-seams, and light that reaches you *through* frosted acrylic rather than blooming off
-an edge. Endfield is industrial signage printed on metal — zero corner radius,
-chamfered notches, stencil numerals, hazard tape.
+The palette keeps metal neutral. Blue appears as light inside channels and windows.
+Yellow marks labels and status. Each color has one job.
 
-So the site is built as a piece of hardware. The chassis is neutral graphite with no
-colour in it at all; blue only ever appears as light inside a channel or behind a
-window, and signal yellow only ever appears as printed marking. Keeping the metal
-neutral is what leaves the LED something to do.
+## Build notes
 
-## Notes on the build
+- Astro content collections validate Blog, Work, and Art entries during the build.
+- One scroll controller updates section progress. CSS handles the visual response.
+- Content renders in its finished state without JavaScript and under reduced-motion
+  settings.
+- The hidden Shell reads from the same collections as the visible pages, so its
+  commands stay current.
 
-- **Content collections** for the log and the rack, schema-checked at build time.
-  A malformed post fails the build instead of shipping broken.
-- **One authored motion system** rather than scattered hover effects: modules seat
-  into the chassis and their LED channel fills as they come online. Everything is
-  `IntersectionObserver` plus CSS transitions.
-- **Visible by default.** Every reveal only ever adds. With JavaScript disabled, or
-  with `prefers-reduced-motion` set, the finished state is what renders.
-- **The shell is real.** It reads the same content collections the page does, so
-  `log` and `projects` can't drift from what's on screen, and `open UNIT.01` routes
-  to an actual page.
+## Next
 
-## Still open
-
-The project cards want real screenshots — right now the rack is one unit deep. The
-Spotify and GitHub telemetry panels depend on third-party services that go down
-regularly, so both degrade to a printed offline plate rather than a broken image.
+The Work section needs more project screenshots and case studies. External music and
+GitHub panels will stay optional so third-party outages cannot break the page.

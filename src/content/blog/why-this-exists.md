@@ -1,18 +1,19 @@
 ---
 title: why this exists
-summary: short version — i was bored and wanted a corner of the internet that's actually mine.
+summary: i wanted a personal site that felt like mine, so a weekend build grew into this hardware-shaped corner of the web.
 date: 2026-07-31
 channel: META
 ---
 
-no grand reason for this site. i was bored one weekend, tired of every
-"portfolio" being a template with my name swapped in, and wanted something
-that's actually mine instead of a platform i don't own. it spiraled from
-"quick landing page" into whatever this chassis thing is now.
+i started this site after seeing too many portfolios built from the same template. i
+wanted a place i owned, with room for engineering notes, project write-ups,
+commissioned art, and whatever else kept my attention.
 
-the log is where the actual writing goes — eng notes, cloud stuff i'm still
-figuring out, art dumps, con recaps if i ever make it to one. work is the
-projects. art is monumei getting drawn by people way more talented than me.
-shell is a terminal because why not, honestly.
+one weekend became a full interface system. panels turned into a chassis, section
+labels became hardware addresses, and the hidden shell became functional.
 
-more entries show up whenever i'm bored again, which is often.
+the blog holds engineering notes, design decisions, cloud experiments, art posts, and
+convention recaps. work covers projects. art collects monumei commissions and credits
+each artist.
+
+i add posts when i have something worth keeping.

@@ -17,8 +17,8 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
 ---
 
 <Base
-  title="Art — Monumei"
-  description="Monumei's OC, drawn by commissioned artists — each piece credited to the artist who made it — plus Monumei's own work."
+  title="Art | Monumei"
+  description="Commissioned Monumei artwork with artist credits, plus pieces drawn by Monumei."
   location="ART"
 >
   <div class="page rail">
@@ -31,8 +31,8 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
       all.length ? (
         <>
           <p class="page__lead">
-            Monumei, my OC. Most of what hangs here was drawn by artists I commissioned,
-            and every piece names the person who drew it. The rest I drew myself.
+            Monumei is my original character. I commission most pieces from artists whose
+            work I admire, and I credit each artist here. I draw some pieces too.
           </p>
 
           {commissions.length > 0 && (
@@ -43,8 +43,8 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
               </div>
 
               <p class="sec__lead">
-                Drawn for me by other artists. Where I have their links, the credit opens
-                their card — several of them take commissions.
+                Artists made these pieces for me. Select a linked credit to find their work
+                and commission details.
               </p>
 
               <div class="wall deck" data-stage="view">
@@ -73,7 +73,7 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
       ) : (
         <EmptyBay
           label="Gallery empty"
-          hint="No pieces yet. Add a markdown file per artwork with its image, and commissions get their artist credit printed automatically."
+          hint="No pieces yet. Add one Markdown file per artwork with its image and artist credit."
           path="src/content/art/*.md"
         />
       )

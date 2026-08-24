@@ -6,9 +6,8 @@ export async function GET(context: APIContext) {
   const posts = await getPosts();
 
   return rss({
-    title: 'Monumei — The Log',
-    description:
-      'Writing by Monumei on fullstack engineering, cloud, design, conventions, and the occasional rhythm-game tangent.',
+    title: 'Monumei | Blog',
+    description: 'Notes on software engineering, products, databases, AI, design, and rhythm games.',
     site: context.site ?? 'https://monumei.com',
     items: posts.map((post) => ({
       title: post.data.title,

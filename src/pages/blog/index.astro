@@ -11,13 +11,13 @@ const counts = channelCounts(posts);
 ---
 
 <Base
-  title="The Log — Monumei"
-  description="Writing by Monumei on fullstack engineering, cloud, design, conventions, and the occasional rhythm-game tangent."
+  title="Blog | Monumei"
+  description="Notes on software engineering, products, databases, AI, design, and rhythm games."
   location="LOG"
 >
   <div class="page rail">
     <ModulePlate
-      title="The Log"
+      title="Blog"
       meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}` : undefined}
     />
 
@@ -39,8 +39,8 @@ const counts = channelCounts(posts);
         </div>
       ) : (
         <EmptyBay
-          label="Log buffer empty"
-          hint="No entries written yet. Drop a markdown file in the blog collection and it appears here."
+          label="Blog empty"
+          hint="No posts yet. Add a Markdown file to publish the first one."
           path="src/content/blog/*.md"
         />
       )

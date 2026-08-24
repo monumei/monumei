@@ -24,14 +24,14 @@ const note = CHANNEL_NOTES[channel];
 ---
 
 <Base
-  title={`${channel} — The Log — Monumei`}
-  description={`${note}. ${posts.length} ${posts.length === 1 ? 'entry' : 'entries'} in the ${channel} channel of Monumei's log.`}
+  title={`${channel} | Blog | Monumei`}
+  description={`${note}. ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} in the ${channel} channel of Monumei's blog.`}
   location="LOG"
 >
   <div class="page rail">
     <ModulePlate
       title={channel}
-      meta={`${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}`}
+      meta={`${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`}
     />
 
     <p class="page__note">{note}</p>

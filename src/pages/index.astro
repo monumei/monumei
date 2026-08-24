@@ -51,7 +51,7 @@ const termArt = art.map((a) => ({
 
 <Base
   title="Monumei"
-  description="Monumei — principal software engineer, occasional artist, and 15,000-play maimai enjoyer. Portfolio, writing log, and art gallery."
+  description="Monumei is a software engineer, rhythm-game player, and character-art collector. Browse projects, writing, and commissioned art."
   location="ROOT"
 >
   <Hero />
@@ -59,7 +59,7 @@ const termArt = art.map((a) => ({
 
   <Act id="log" labelledby="log-title" budget={70} loc="LOG">
     <ModulePlate
-      title="The Log"
+      title="Blog"
       meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}` : undefined}
       id="log-title"
     />
@@ -80,8 +80,8 @@ const termArt = art.map((a) => ({
         </div>
       ) : (
         <EmptyBay
-          label="Log buffer empty"
-          hint="No entries written yet. Drop a markdown file in the blog collection and it appears here."
+          label="Blog empty"
+          hint="No posts yet. Add a Markdown file to publish the first one."
           path="src/content/blog/*.md"
         />
       )
@@ -91,7 +91,7 @@ const termArt = art.map((a) => ({
       posts.length > 0 && (
         <p class="act__more rise rise--late">
           <a class="btn btn--ghost" href="/blog/">
-            {posts.length > recent.length ? `All ${posts.length} entries` : 'Open the log'}
+            {posts.length > recent.length ? `All ${posts.length} posts` : 'Open the blog'}
           </a>
         </p>
       )
