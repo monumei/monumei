@@ -17,13 +17,14 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
 ---
 
 <Base
-  title="Art | Monumei"
+  title="Art and commissions | Monumei"
   description="Commissioned Monumei artwork with artist credits, plus pieces drawn by Monumei."
   location="ART"
 >
   <div class="page rail">
     <ModulePlate
       title="Art"
+      headingLevel="h1"
       meta={all.length ? `${all.length} ${all.length === 1 ? 'piece' : 'pieces'}` : undefined}
     />
 

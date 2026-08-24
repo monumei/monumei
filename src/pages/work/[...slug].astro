@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import { bay } from '../../lib/format';
+import { workSchema } from '../../lib/seo';
 
 export const getStaticPaths = (async () => {
   const units = await getCollection('work', ({ data }) => !data.draft);
@@ -11,6 +12,16 @@ export const getStaticPaths = (async () => {
 
 const { unit } = Astro.props;
 const { Content } = await render(unit);
+const path = `/work/${unit.id}/`;
+const schema = workSchema({
+  title: unit.data.title,
+  description: unit.data.summary,
+  path,
+  tech: unit.data.tech,
+  stack: unit.data.stack,
+  repo: unit.data.repo,
+  live: unit.data.live,
+});
 
 const specs = [
   { k: 'Bay', v: bay(unit.data.unit) },
@@ -20,7 +31,12 @@ const specs = [
 ];
 ---
 
-<Base title={`${unit.data.title} | Monumei`} description={unit.data.summary} location="WORK">
+<Base
+  title={`${unit.data.title} | Monumei`}
+  description={unit.data.summary}
+  location="WORK"
+  schema={schema}
+>
   <article class="unit-page rail">
     <a class="unit-page__back data" href="/work/">← Selected Work</a>
 

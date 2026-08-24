@@ -11,13 +11,14 @@ const counts = channelCounts(posts);
 ---
 
 <Base
-  title="Blog | Monumei"
-  description="Notes on software engineering, products, databases, AI, design, and rhythm games."
+  title="Software, rhythm games, and art notes | Monumei"
+  description="Notes on software, products, databases, design, art, events, and rhythm games."
   location="LOG"
 >
   <div class="page rail">
     <ModulePlate
       title="Blog"
+      headingLevel="h1"
       meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}` : undefined}
     />
 

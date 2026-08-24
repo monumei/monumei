@@ -5,6 +5,7 @@ import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import { longDate, iso, stamp } from '../../lib/format';
 import { getPosts, neighbours } from '../../lib/log';
+import { blogPostSchema } from '../../lib/seo';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
@@ -15,9 +16,26 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 
 const { newer, older } = neighbours(await getPosts(), post.id);
+const path = `/blog/${post.id}/`;
+const publishedTime = iso(post.data.date);
+const schema = blogPostSchema({
+  title: post.data.title,
+  description: post.data.summary,
+  path,
+  publishedDate: publishedTime,
+  section: post.data.channel,
+  tags: post.data.tags,
+});
 ---
 
-<Base title={`${post.data.title} | Monumei`} description={post.data.summary} location="LOG">
+<Base
+  title={`${post.data.title} | Monumei`}
+  description={post.data.summary}
+  location="LOG"
+  openGraphType="article"
+  article={{ publishedTime, section: post.data.channel, tags: post.data.tags }}
+  schema={schema}
+>
   <article class="post rail rail--read">
     <div class="post__head">
       <a class="post__back data" href="/blog/">← Back to Blog</a>

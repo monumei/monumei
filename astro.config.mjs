@@ -8,5 +8,9 @@ export default defineConfig({
   prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
   // Both integrations run at build time and ship no runtime JavaScript, which
   // keeps the site's zero-runtime-dependency rule intact.
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !new URL(page).pathname.startsWith('/blog/channel/'),
+    }),
+  ],
 });

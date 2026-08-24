@@ -11,13 +11,14 @@ const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
 ---
 
 <Base
-  title="Selected Work | Monumei"
-  description="Software projects built across product, data, infrastructure, and interface work."
+  title="Software projects | Monumei"
+  description="Selected software projects spanning products, databases, infrastructure, interfaces, and experiments."
   location="WORK"
 >
   <div class="page rail">
     <ModulePlate
       title="Selected Work"
+      headingLevel="h1"
       meta={units.length ? `${units.length} ${units.length === 1 ? 'project' : 'projects'}` : undefined}
     />
 

@@ -3,9 +3,11 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base
-  title="404 | no such module"
-  description="That address doesn't resolve to anything on this chassis."
+  title="Page not found | Monumei"
+  description="That address does not resolve to a page on monumei.com."
   location="FAULT"
+  canonical={false}
+  index={false}
 >
   <section class="fault rail">
     <div class="fault__hazard" aria-hidden="true"></div>

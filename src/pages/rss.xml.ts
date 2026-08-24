@@ -7,7 +7,7 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: 'Monumei | Blog',
-    description: 'Notes on software engineering, products, databases, AI, design, and rhythm games.',
+    description: 'Notes on software, products, databases, design, art, events, and rhythm games.',
     site: context.site ?? 'https://monumei.com',
     items: posts.map((post) => ({
       title: post.data.title,

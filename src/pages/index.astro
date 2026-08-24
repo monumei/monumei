@@ -15,6 +15,11 @@ import NowPlaying from '../components/NowPlaying.astro';
 import EmptyBay from '../components/EmptyBay.astro';
 import { getPosts } from '../lib/log';
 import { getArt, artistCounts } from '../lib/art';
+import { homeSchema } from '../lib/seo';
+
+const title = 'Monumei | Software, rhythm games, and art';
+const description =
+  'Monumei builds software, plays maimai, and collects character art. Browse projects, writing, and credited commissions.';
 
 const posts = await getPosts();
 
@@ -50,9 +55,10 @@ const termArt = art.map((a) => ({
 ---
 
 <Base
-  title="Monumei"
-  description="Monumei is a software engineer, rhythm-game player, and character-art collector. Browse projects, writing, and commissioned art."
+  title={title}
+  description={description}
   location="ROOT"
+  schema={homeSchema(description)}
 >
   <Hero />
   <Systems />

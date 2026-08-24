@@ -3,14 +3,16 @@ interface Props {
   title: string;
   meta?: string;
   id?: string;
+  headingLevel?: 'h1' | 'h2';
 }
 
-const { title, meta, id } = Astro.props;
+const { title, meta, id, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
 ---
 
 <div class="plate">
   <div class="plate__row rise">
-    <h2 class="plate__title" id={id}>{title}</h2>
+    <Heading class="plate__title" id={id}>{title}</Heading>
     {meta && <span class="plate__meta data">{meta}</span>}
   </div>
   <div class="plate__channel led-channel"></div>
