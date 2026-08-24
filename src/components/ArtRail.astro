@@ -33,16 +33,16 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
       </a>
     </div>
 
-    <div class="arail__viewport" data-track>
+    <div class="arail__viewport" data-track data-art-viewport tabindex="0" aria-label="Art preview">
       <ul class="arail__track">
         {
-          pieces.map((entry) => {
+          pieces.map((entry, index) => {
             const d = entry.data;
             const credited = !!d.artist;
             const hasCard = credited && d.artistLinks.length > 0;
             const label = d.artistHandle || d.artist || '';
             return (
-              <li class="cell">
+              <li class="cell" data-art-cell data-index={index}>
                 <a class="cell__link brackets" href="/art/">
                   <Image
                     src={d.image}
@@ -78,6 +78,21 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
         }
       </ul>
     </div>
+
+    {
+      pieces.length > 1 && (
+        <div class="arail__progress" data-art-progress>
+          <div class="arail__dots" aria-hidden="true">
+            {pieces.map((_, index) => (
+              <span class="arail__dot" data-art-dot data-active={index === 0 ? '' : undefined} />
+            ))}
+          </div>
+          <span class="sr-only" data-art-status aria-live="polite">
+            Piece 1 of {pieces.length}
+          </span>
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -274,25 +289,29 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     padding: 2px 7px;
   }
 
+  .arail__progress {
+    display: none;
+  }
+
   @media (max-width: 860px), (max-height: 640px) {
     .arail {
-      --budget: 120vh;
       --cell-h: clamp(240px, 58svh, 420px);
-      height: calc(100svh + var(--budget));
+      height: auto;
     }
 
     .arail__frame {
-      position: sticky;
-      height: 100svh;
+      position: static;
+      height: auto;
       padding-block: clamp(68px, 10svh, var(--s8));
-      overflow: hidden;
+      overflow: visible;
     }
 
     .arail__viewport {
-      overflow: hidden;
-      scroll-snap-type: none;
-      overscroll-behavior-x: auto;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
       scrollbar-width: none;
+      touch-action: pan-x pan-y;
       padding-block-end: var(--s2);
     }
 
@@ -301,11 +320,44 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     }
 
     .arail__track {
-      transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
+      transform: none;
+      will-change: auto;
     }
 
     .cell {
-      scroll-snap-align: none;
+      scroll-snap-align: start;
+      scroll-snap-stop: normal;
+    }
+
+    .arail__progress {
+      display: flex;
+      justify-content: center;
+      padding-inline: var(--pad);
+    }
+
+    .arail__dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 20px;
+    }
+
+    .arail__dot {
+      width: 5px;
+      height: 5px;
+      background: var(--chassis-4);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      transition:
+        width var(--t-fast) var(--ease-snap),
+        background var(--t-fast) var(--ease-snap),
+        box-shadow var(--t-fast) var(--ease-snap);
+    }
+
+    .arail__dot[data-active] {
+      width: 18px;
+      background: var(--led);
+      box-shadow: var(--emit-led);
+      clip-path: none;
     }
   }
 
@@ -351,6 +403,7 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     .arail__viewport {
       overflow-x: auto;
       scrollbar-width: none;
+      scroll-snap-type: x mandatory;
     }
 
     .arail__track {
@@ -359,6 +412,10 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 
     .cell__link:hover :global(img) {
       transform: none;
+    }
+
+    .arail__dot {
+      transition-duration: 1ms;
     }
   }
 </style>
@@ -404,6 +461,45 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     if (document.fonts?.ready) document.fonts.ready.then(measure);
     for (const img of document.querySelectorAll('.arail img')) {
       if (!(img as HTMLImageElement).complete) img.addEventListener('load', measure, { once: true });
+    }
+
+    for (const viewport of document.querySelectorAll<HTMLElement>('[data-art-viewport]')) {
+      if (viewport.dataset.artReady === '') continue;
+      viewport.dataset.artReady = '';
+
+      const rail = viewport.closest<HTMLElement>('.arail');
+      const cells = [...viewport.querySelectorAll<HTMLElement>('[data-art-cell]')];
+      const dots = [...(rail?.querySelectorAll<HTMLElement>('[data-art-dot]') ?? [])];
+      const status = rail?.querySelector<HTMLElement>('[data-art-status]');
+      let queued = false;
+
+      const updatePosition = () => {
+        queued = false;
+        let active = 0;
+        let distance = Infinity;
+
+        for (const [index, cell] of cells.entries()) {
+          const next = Math.abs(cell.offsetLeft - viewport.scrollLeft);
+          if (next < distance) {
+            active = index;
+            distance = next;
+          }
+        }
+
+        dots.forEach((dot, index) => dot.toggleAttribute('data-active', index === active));
+        if (status) status.textContent = `Piece ${active + 1} of ${cells.length}`;
+      };
+
+      viewport.addEventListener(
+        'scroll',
+        () => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(updatePosition);
+        },
+        { passive: true }
+      );
+      updatePosition();
     }
   };
 

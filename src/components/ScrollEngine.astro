@@ -75,6 +75,14 @@
 
   const measureTracks = () => {
     for (const track of document.querySelectorAll<HTMLElement>('[data-track]')) {
+      const artFrame = track
+        .closest<HTMLElement>('.arail')
+        ?.querySelector<HTMLElement>('.arail__frame');
+      if (artFrame && getComputedStyle(artFrame).position !== 'sticky') {
+        track.style.removeProperty('--travel');
+        continue;
+      }
+
       const travel = Math.max(0, track.scrollWidth - track.clientWidth);
       track.style.setProperty('--travel', `${travel}px`);
     }
