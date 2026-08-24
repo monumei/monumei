@@ -2,31 +2,27 @@
 const systems = [
   {
     k: 'Software Engineering',
-    v: 'Data, product, solutions — whichever the problem needs this week. Principal by title, generalist by habit.',
-    head: 'In active use',
+    v: 'I work across product delivery, technical discovery, data design, and AI features.',
+    head: 'Work I take on',
     tools: [
-      'TypeScript',
-      'React',
-      'Next.js',
-      'Tailwind',
-      'Bun',
-      'Elysia',
-      'Vite',
-      'Python',
-      'discord.js',
+      'Full-stack Engineering',
+      'Product Engineering',
+      'Solutions Engineering',
+      'Database Engineering',
+      'AI Engineering',
     ],
   },
   {
-    k: 'Art',
-    v: 'Mostly Monumei, mostly commissioned from artists better at this than me. Some of it is actually mine.',
-    head: 'Status',
-    note: 'The gallery has the receipts.',
+    k: 'Rhythm Games',
+    v: 'Maimai has stayed in the rotation for more than 15,000 plays.',
+    head: 'Current status',
+    note: 'Still playing.',
   },
   {
-    k: 'Rhythm games',
-    v: '15,000+ maimai plays and counting. Unfortunately a personality trait at this point.',
-    head: 'Status',
-    note: 'Still going.',
+    k: 'Art and Commissions',
+    v: 'I collect commissioned art of Monumei, credit each artist, and draw a few pieces myself.',
+    head: 'Browse',
+    note: 'The gallery keeps every piece with its artist credit.',
   },
 ];
 
@@ -67,13 +63,14 @@ const lines = [
     <div class="sys__veil" aria-hidden="true"></div>
 
     <div class="sys__inner rail">
-      <h2 class="sys__h" id="sys-h">What I actually do</h2>
+      <h2 class="sys__h" id="sys-h">Engineering, rhythm games, and art.</h2>
 
       <ol class="sys__list" style={`--n:${systems.length}`}>
         {
           systems.map((s, i) => (
             <li class="sys__item" style={`--i:${i}`}>
               <span class="sys__rule" aria-hidden="true" />
+              <span class="sys__num data" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
 
               <div class="sys__text">
                 <h3 class="sys__k">{s.k}</h3>
@@ -170,7 +167,7 @@ const lines = [
     --out: clamp(0, calc((var(--l) - 1) * 3.4), 1);
     --act: calc(var(--in) - var(--out));
     display: grid;
-    grid-template-columns: 3px minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: 3px 3ch minmax(0, 1.15fr) minmax(0, 1fr);
     align-items: start;
     gap: clamp(16px, 2.4vw, 34px);
     opacity: calc(0.14 + var(--act) * 0.86);
@@ -182,6 +179,13 @@ const lines = [
     align-self: stretch;
     background: var(--chassis-3);
     overflow: hidden;
+  }
+
+  .sys__num {
+    padding-block-start: 0.2em;
+    font-size: clamp(0.6875rem, 1vw, 0.8125rem);
+    letter-spacing: 0.08em;
+    color: color-mix(in oklab, var(--ink-4), var(--sig) calc(var(--act) * 62%));
   }
 
   .sys__rule::after {
@@ -259,11 +263,11 @@ const lines = [
 
   @media (max-width: 900px) {
     .sys__item {
-      grid-template-columns: 3px minmax(0, 1fr);
+      grid-template-columns: 3px 3ch minmax(0, 1fr);
     }
 
     .sys__evidence {
-      grid-column: 2;
+      grid-column: 3;
       transform: none;
     }
   }
