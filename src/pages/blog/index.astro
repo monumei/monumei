@@ -18,7 +18,7 @@ const counts = channelCounts(posts);
   <div class="page rail">
     <ModulePlate
       title="Blog"
-      meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}` : undefined}
+      meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}` : undefined}
     />
 
     <ChannelBar counts={counts} total={posts.length} />

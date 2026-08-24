@@ -121,7 +121,8 @@ const tone: Record<string, string> = {
     transition: color var(--t-fast) var(--ease-snap);
   }
 
-  .unit:hover .unit__title {
+  .unit:hover .unit__title,
+  .unit:focus-visible .unit__title {
     color: var(--led-hot);
   }
 

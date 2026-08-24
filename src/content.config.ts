@@ -6,13 +6,13 @@ export const CHANNELS = ['ENG', 'CLOUD', 'DESIGN', 'ART', 'EVENT', 'LIFE', 'META
 export type ChannelName = (typeof CHANNELS)[number];
 
 export const CHANNEL_NOTES: Record<ChannelName, string> = {
-  ENG: 'Building things',
-  CLOUD: 'Infrastructure, still learning',
-  DESIGN: 'Interfaces and type',
-  ART: 'Drawing',
+  ENG: 'Software engineering notes',
+  CLOUD: 'Infrastructure notes and experiments',
+  DESIGN: 'Interfaces and typography',
+  ART: 'Drawing and commissions',
   EVENT: 'Conventions and meetups',
-  LIFE: 'Everything else',
-  META: 'About this site',
+  LIFE: 'Notes outside work',
+  META: 'Building this site',
 };
 
 const blog = defineCollection({

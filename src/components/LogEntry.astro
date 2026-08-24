@@ -96,7 +96,8 @@ const { href, title, summary, channel, date, sample = false } = Astro.props;
     transition: color var(--t-fast) var(--ease-snap);
   }
 
-  .row:hover .row__title {
+  .row:hover .row__title,
+  .row:focus-visible .row__title {
     color: var(--led-hot);
   }
 

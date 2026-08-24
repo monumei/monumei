@@ -13,10 +13,7 @@ const { posts, units, art } = Astro.props;
 <dialog class="shell" id="shell-overlay" aria-labelledby="shell-overlay-title">
   <div class="shell__frame">
     <div class="shell__head">
-      <div>
-        <p class="shell__eyebrow data">HIDDEN MODULE / SHELL</p>
-        <h2 class="shell__title" id="shell-overlay-title">Terminal</h2>
-      </div>
+      <h2 class="shell__title" id="shell-overlay-title">Terminal</h2>
 
       <button class="shell__close btn btn--ghost" type="button" data-shell-close>
         Close <span class="data" aria-hidden="true">Esc</span>
@@ -82,13 +79,6 @@ const { posts, units, art } = Astro.props;
     margin-block-end: var(--s5);
   }
 
-  .shell__eyebrow {
-    margin-block-end: var(--s2);
-    font-size: 0.625rem;
-    letter-spacing: 0.18em;
-    color: var(--sig);
-  }
-
   .shell__title {
     font-size: clamp(1.5rem, 3vw, 2.25rem);
   }
@@ -130,11 +120,6 @@ const { posts, units, art } = Astro.props;
 
     .shell__head {
       align-items: center;
-    }
-
-    .shell__eyebrow {
-      max-width: 18ch;
-      line-height: 1.5;
     }
 
     .shell__close span {
@@ -187,6 +172,11 @@ const { posts, units, art } = Astro.props;
     let lastFocus: HTMLElement | null = null;
 
     const dialog = () => document.querySelector<HTMLDialogElement>('#shell-overlay');
+    const finishClose = () => {
+      delete root.dataset.shellOpen;
+      lastFocus?.focus();
+      lastFocus = null;
+    };
     const editable = (target: EventTarget | null) => {
       const element = target as HTMLElement | null;
       return !!element?.closest('input, textarea, select, [contenteditable="true"]');
@@ -202,6 +192,13 @@ const { posts, units, art } = Astro.props;
     };
 
     document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && dialog()?.open) {
+        event.preventDefault();
+        dialog()?.close();
+        finishClose();
+        return;
+      }
+
       if (editable(event.target)) return;
 
       const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
@@ -228,6 +225,7 @@ const { posts, units, art } = Astro.props;
       const target = event.target as HTMLElement;
       if (target.closest('[data-shell-close]')) {
         dialog()?.close();
+        finishClose();
         return;
       }
 
@@ -250,9 +248,7 @@ const { posts, units, art } = Astro.props;
 
     document.addEventListener('close', (event) => {
       if (!(event.target instanceof HTMLDialogElement) || event.target.id !== 'shell-overlay') return;
-      delete root.dataset.shellOpen;
-      lastFocus?.focus();
-      lastFocus = null;
+      finishClose();
     }, true);
   };
 
