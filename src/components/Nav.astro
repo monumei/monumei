@@ -9,14 +9,13 @@ const path = Astro.url.pathname;
 
 const links = [
   ...ROUTES.map((r) => ({ href: r.href, label: r.label.replace(/^The /, ''), match: r.href.slice(0, -1) })),
-  { href: '/#shell', label: 'Shell', match: null },
   { href: '/#channels', label: 'Contact', match: null },
 ];
 ---
 
 <header class="isle" id="isle">
   <nav class="isle__pill" aria-label="Primary">
-    <a class="isle__mark" href="/" aria-label="Monumei — home">
+    <a class="isle__mark" href="/" aria-label="Monumei, home" data-shell-mark>
       <svg class="isle__led" viewBox="0 0 32 30" aria-hidden="true" focusable="false">
         <path d="M16 28.5 4.2 17.3C1.6 14.8 0 12.2 0 8.9 0 3.8 3.9 0 8.8 0c2.8 0 5.4 1.3 7.2 3.5C17.8 1.3 20.4 0 23.2 0 28.1 0 32 3.8 32 8.9c0 3.3-1.6 5.9-4.2 8.4L16 28.5Z" />
       </svg>

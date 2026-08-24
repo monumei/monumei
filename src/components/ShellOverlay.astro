@@ -1,0 +1,260 @@
+---
+import Terminal from './Terminal.astro';
+
+interface Props {
+  posts: { title: string; date: Date; href: string }[];
+  units: { unit: number; title: string; tech: string; href: string }[];
+  art: { title: string; artist: string }[];
+}
+
+const { posts, units, art } = Astro.props;
+---
+
+<dialog class="shell" id="shell-overlay" aria-labelledby="shell-overlay-title">
+  <div class="shell__frame">
+    <div class="shell__head">
+      <div>
+        <p class="shell__eyebrow data">HIDDEN MODULE / SHELL</p>
+        <h2 class="shell__title" id="shell-overlay-title">Terminal</h2>
+      </div>
+
+      <button class="shell__close btn btn--ghost" type="button" data-shell-close>
+        Close <span class="data" aria-hidden="true">Esc</span>
+      </button>
+    </div>
+
+    <Terminal posts={posts} units={units} art={art} />
+  </div>
+</dialog>
+
+<style>
+  .shell {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding:
+      max(var(--s5), env(safe-area-inset-top))
+      max(var(--gutter), env(safe-area-inset-right))
+      max(var(--s5), env(safe-area-inset-bottom))
+      max(var(--gutter), env(safe-area-inset-left));
+    overflow-y: auto;
+    color: var(--ink-2);
+    background: rgb(8 9 11 / 0.92);
+    border: 0;
+  }
+
+  .shell::backdrop {
+    background: rgb(0 0 0 / 0.72);
+    backdrop-filter: blur(10px);
+  }
+
+  .shell__frame {
+    width: 100%;
+    max-width: var(--rail);
+    margin: auto;
+    padding: clamp(18px, 3vw, 40px);
+    background:
+      linear-gradient(180deg, rgb(46 123 255 / 0.06), transparent 120px),
+      var(--chassis-0);
+    border: 1px solid var(--seam-strong);
+    box-shadow: var(--lift-3);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--notch-l)) 0,
+      100% var(--notch-l),
+      100% 100%,
+      var(--notch-l) 100%,
+      0 calc(100% - var(--notch-l))
+    );
+  }
+
+  .shell[open] .shell__frame {
+    animation: shell-seat 260ms var(--ease-seat) both;
+  }
+
+  .shell__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-block-end: var(--s5);
+  }
+
+  .shell__eyebrow {
+    margin-block-end: var(--s2);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    color: var(--sig);
+  }
+
+  .shell__title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .shell__close {
+    flex: none;
+  }
+
+  .shell__close span {
+    margin-inline-start: var(--s2);
+    font-size: 0.625rem;
+    color: var(--sig);
+  }
+
+  .shell :global(.term__screen) {
+    min-height: clamp(240px, 48svh, 420px);
+    max-height: min(58svh, 520px);
+  }
+
+  @keyframes shell-seat {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .shell {
+      padding-inline: var(--s3);
+    }
+
+    .shell__frame {
+      padding: var(--s4);
+    }
+
+    .shell__head {
+      align-items: center;
+    }
+
+    .shell__eyebrow {
+      max-width: 18ch;
+      line-height: 1.5;
+    }
+
+    .shell__close span {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shell[open] .shell__frame {
+      animation-duration: 1ms;
+    }
+  }
+</style>
+
+<style is:global>
+  html[data-shell-open],
+  html[data-shell-open] body {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  const installShellController = () => {
+    const root = document.documentElement;
+    if (root.dataset.shellController === '') return;
+    root.dataset.shellController = '';
+
+    const konami = [
+      'ArrowUp',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowLeft',
+      'ArrowRight',
+      'b',
+      'a',
+    ];
+    const typedTarget = 'shell';
+    const typedReset = 1200;
+    const tapTarget = 5;
+    const tapWindow = 1800;
+
+    let keyIndex = 0;
+    let typed = '';
+    let typedTimer = 0;
+    let taps = 0;
+    let tapTimer = 0;
+    let lastFocus: HTMLElement | null = null;
+
+    const dialog = () => document.querySelector<HTMLDialogElement>('#shell-overlay');
+    const editable = (target: EventTarget | null) => {
+      const element = target as HTMLElement | null;
+      return !!element?.closest('input, textarea, select, [contenteditable="true"]');
+    };
+
+    const open = () => {
+      const shell = dialog();
+      if (!shell || shell.open) return;
+      lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      shell.showModal();
+      root.dataset.shellOpen = '';
+      requestAnimationFrame(() => shell.querySelector<HTMLInputElement>('#term-input')?.focus());
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (editable(event.target)) return;
+
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      keyIndex = key === konami[keyIndex] ? keyIndex + 1 : key === konami[0] ? 1 : 0;
+      if (keyIndex === konami.length) {
+        keyIndex = 0;
+        open();
+        return;
+      }
+
+      if (event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) return;
+      typed = `${typed}${event.key.toLowerCase()}`.slice(-typedTarget.length);
+      window.clearTimeout(typedTimer);
+      typedTimer = window.setTimeout(() => {
+        typed = '';
+      }, typedReset);
+      if (typed === typedTarget) {
+        typed = '';
+        open();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('[data-shell-close]')) {
+        dialog()?.close();
+        return;
+      }
+
+      const mark = target.closest<HTMLElement>('[data-shell-mark]');
+      const shell = dialog();
+      if (!mark || !shell || !matchMedia('(pointer: coarse)').matches) return;
+      event.preventDefault();
+
+      taps += 1;
+      window.clearTimeout(tapTimer);
+      tapTimer = window.setTimeout(() => {
+        taps = 0;
+      }, tapWindow);
+
+      if (taps >= tapTarget) {
+        taps = 0;
+        open();
+      }
+    });
+
+    document.addEventListener('close', (event) => {
+      if (!(event.target instanceof HTMLDialogElement) || event.target.id !== 'shell-overlay') return;
+      delete root.dataset.shellOpen;
+      lastFocus?.focus();
+      lastFocus = null;
+    }, true);
+  };
+
+  installShellController();
+</script>

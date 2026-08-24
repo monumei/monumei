@@ -25,7 +25,7 @@ const data = {
     href: c.href ?? '',
   })),
   routes: [
-    { name: 'log', href: '/blog/' },
+    { name: 'blog', href: '/blog/' },
     { name: 'work', href: '/work/' },
     { name: 'art', href: '/art/' },
     { name: 'home', href: '/' },
@@ -37,7 +37,7 @@ const data = {
   <div class="term__bar">
     <span class="term__id data">
       <span class="dot dot--pulse"></span>
-      monumei@shell — /home/monumei
+      monumei@shell /home/monumei
     </span>
     <span class="term__hint data">type <b>help</b> · <b>Tab</b> completes</span>
   </div>
@@ -231,13 +231,13 @@ const data = {
         run: () => [
           { text: 'available commands', cls: 'l-led' },
           { text: '  whoami        identity readout' },
-          { text: '  log           latest entries' },
+          { text: '  blog          latest posts' },
           { text: '  work          selected projects' },
           { text: '  art           gallery index' },
           { text: '  contact       open channels' },
           { text: '  funfacts      the things not on the CV' },
           { text: '  search <q>    find anything on the site' },
-          { text: '  go <name>     open a section: log, work, art, home' },
+          { text: '  go <name>     open a section: blog, work, art, home' },
           { text: '  open <id>     open a project, e.g. open UNIT.01' },
           { text: '  matcha        ???', cls: 'l-sig' },
           { text: '  clear         wipe buffer' },
@@ -248,8 +248,8 @@ const data = {
       whoami: {
         help: 'identity readout',
         run: () => [
-          { text: 'monumei — principal software engineer', cls: 'l-echo' },
-          { text: 'data · product · solutions — pick a lane' },
+          { text: 'monumei · principal software engineer', cls: 'l-echo' },
+          { text: 'full-stack · product · solutions · database · AI' },
           { text: '' },
         ],
       },
@@ -260,14 +260,14 @@ const data = {
           { text: 'fun facts', cls: 'l-led' },
           { text: '  15,000+ maimai plays' },
           { text: '  runs on matcha latte and monster energy', cls: 'l-sig' },
-          { text: '  still figuring some of it out as i go' },
-          { text: '  draws, lowkey' },
+          { text: '  collects commissioned art of monumei' },
+          { text: '  draws some pieces too' },
           { text: '' },
         ],
       },
 
-      log: {
-        help: 'latest entries',
+      blog: {
+        help: 'latest posts',
         run: () =>
           data.posts.length
             ? [
@@ -278,8 +278,8 @@ const data = {
                 { text: '' },
               ]
             : [
-                { text: 'log buffer empty', cls: 'l-dim' },
-                { text: 'add markdown to src/content/blog/', cls: 'l-sig' },
+                { text: 'blog empty', cls: 'l-dim' },
+                { text: 'add Markdown to src/content/blog/', cls: 'l-sig' },
                 { text: '' },
               ],
       },
@@ -351,7 +351,7 @@ const data = {
 
           for (const p of data.posts) {
             if (p.title.toLowerCase().includes(q)) {
-              hits.push({ text: `log    ${p.date}  ${p.title}`, href: p.href });
+              hits.push({ text: `blog   ${p.date}  ${p.title}`, href: p.href });
             }
           }
           for (const u of data.units) {
@@ -369,7 +369,7 @@ const data = {
             ? [{ text: `${hits.length} result${hits.length === 1 ? '' : 's'}`, cls: 'l-led' }, ...hits, { text: '' }]
             : [
                 { text: `no matches for "${q}"`, cls: 'l-dim' },
-                { text: 'search covers entry titles, project names and artwork', cls: 'l-dim' },
+                { text: 'search covers post titles, project names and artwork', cls: 'l-dim' },
                 { text: '' },
               ];
         },
@@ -412,7 +412,7 @@ const data = {
 
           const unit = data.units.find((u) => u.addr === id);
           if (unit) {
-            navigate(unit.href, `opening ${unit.addr} — ${unit.title}`);
+            navigate(unit.href, `opening ${unit.addr} | ${unit.title}`);
             return [];
           }
 
@@ -443,7 +443,7 @@ const data = {
       }
 
       const alias: Record<string, string> = {
-        blog: 'log',
+        log: 'blog',
         projects: 'work',
         ls: 'help',
         skills: 'whoami',

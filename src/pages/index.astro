@@ -9,7 +9,7 @@ import Act from '../components/Act.astro';
 import ModulePlate from '../components/ModulePlate.astro';
 import LogEntry from '../components/LogEntry.astro';
 import WorkUnit from '../components/WorkUnit.astro';
-import Terminal from '../components/Terminal.astro';
+import ShellOverlay from '../components/ShellOverlay.astro';
 import Channels from '../components/Channels.astro';
 import NowPlaying from '../components/NowPlaying.astro';
 import EmptyBay from '../components/EmptyBay.astro';
@@ -143,13 +143,6 @@ const termArt = art.map((a) => ({
 
   {art.length > 0 && <ArtRail pieces={art} counts={artCounts} />}
 
-  <Act id="shell" labelledby="shell-title" budget={60} loc="SHELL">
-    <ModulePlate title="Shell" meta="type help" id="shell-title" />
-    <div class="power">
-      <Terminal posts={termPosts} units={termUnits} art={termArt} />
-    </div>
-  </Act>
-
   <Act id="channels" labelledby="channels-title" budget={50} loc="CONTACT">
     <ModulePlate title="Channels" id="channels-title" />
     <Channels />
@@ -157,6 +150,7 @@ const termArt = art.map((a) => ({
   </Act>
 
   {art.length > 0 && <ArtistCard />}
+  <ShellOverlay posts={termPosts} units={termUnits} art={termArt} />
 </Base>
 
 <style>
