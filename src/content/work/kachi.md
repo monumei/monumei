@@ -6,7 +6,7 @@ tech: Next.js
 stack: [Next.js, React, TypeScript, Elysia, Drizzle ORM, Turso/libSQL, Tailwind CSS, Bun]
 status: ongoing
 year: '2026'
-live: https://kachi-pawn.vercel.app
+live: https://kachi-fawn.vercel.app
 ---
 
 Kachi helps people find agencies. Agencies are organized into Arenas and by
