@@ -6,30 +6,30 @@ tech: Next.js
 stack: [Next.js, React, TypeScript, Elysia, Drizzle ORM, Turso/libSQL, Tailwind CSS, Bun]
 status: ongoing
 year: '2026'
-repo: https://github.com/monumei/kachi
+live: https://kachi-pawn.vercel.app
 ---
 
-Kachi is a responsive agency discovery and ranking application. Next.js Server
-Components read through the public `src/modules/discovery` seam, and a thin,
-authenticated Elysia API exposes the same internal view models from one process.
+Kachi helps people find agencies. Agencies are organized into Arenas and by
+geography, so a visitor can narrow the field to the region and category they
+actually care about instead of scrolling one long list.
 
-## Ranking system
+## Rankings that hold up
 
-Ranking order is deterministic. Movement is persisted per Arena and geography:
-each six-hour bucket writes one immutable Global/region/country run, so historical
-positions can be replayed rather than guessed. Verification states for agencies
-and proofs append immutable history in the same transaction that flips the state.
+Rankings follow a fixed order computed from the underlying data. The same input
+always produces the same result, so a position is never arbitrary.
 
-## Data layer
+Every refresh saves its own record. If an agency sat at #4 in a country last
+week, that fact stays lookable. Movement up or down reflects what actually
+changed, not noise from an unstable sort.
 
-- Drizzle migrations define the schema; `bun dbcheck` verifies required tables
-  and foreign-key integrity.
-- Seeding and JSON batch imports are atomic upserts followed by a ranking refresh.
-- Production migration, seed, and import commands require explicit confirmation
-  against the Turso host before they run.
+## Verification
 
-## Tooling
+Agencies can carry verified states for their profiles and their proofs. Each
+state change is recorded with its review note in place, so the history of who
+confirmed what remains readable after the fact.
 
-Everything runs on Bun — dev server, tests, database commands, and deploys to
-Vercel with libSQL transports bundled into the functions. `bun check` runs lint,
-TypeScript, and unit tests; Playwright covers end-to-end flows.
+## Careful with live data
+
+Changes to production data ask for explicit confirmation before anything runs,
+and imports replace records completely rather than partially. A bad update
+cannot slip through halfway.
