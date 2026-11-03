@@ -31,7 +31,7 @@ export function homeSchema(description: string): JsonLdNode[] {
       '@type': 'Person',
       name: SITE_NAME,
       url: SITE_URL,
-      jobTitle: 'Principal Software Engineer',
+      jobTitle: 'Founding Engineer',
       sameAs: ['https://github.com/monumei', 'https://x.com/m0numei'],
     },
   ];

@@ -1,7 +1,7 @@
 ---
 title: monumei.com
 summary: A static Astro portfolio with a hardware-inspired interface, content collections, and no client framework.
-unit: 1
+unit: 7
 tech: Astro
 stack: [Astro, TypeScript, Vanilla CSS, Bun]
 status: ongoing

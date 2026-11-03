@@ -1,7 +1,7 @@
 ---
 title: Kachi
 summary: Agency discovery and ranking platform backed by Turso/libSQL, with deterministic rankings and an authenticated Elysia API inside one Next.js process.
-unit: 2
+unit: 5
 tech: Next.js
 stack: [Next.js, React, TypeScript, Elysia, Drizzle ORM, Turso/libSQL, Tailwind CSS, Bun]
 status: ongoing

@@ -1,12 +1,12 @@
 # ✨ Hi! I'm Monumei 🌀
 
-### Principal Software Engineer who loves designing and rhythm games
+### Founding engineer who loves designing and rhythm games
 
 ---
 
 ## 🧬 About Me
 
-- 🛠 Currently working as Principal Software Engineer
+- 🛠 Building systems where wrong answers cost money
 - 🎨 Still learning `Cloud Engineering` and `Graphics Design`, alongside `Fullstack Web Development` and `Lowkey Art`
 - 🧤 15k+ maimai player
 - 🍵 Powered by matcha latte and Monster Energy
