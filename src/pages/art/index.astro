@@ -48,7 +48,7 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
                 and commission details.
               </p>
 
-              <div class="wall deck" data-stage="view">
+              <div class="wall deck">
                 {commissions.map((entry) => (
                   <ArtPiece entry={entry} artistCount={countFor(entry.data.artist)} />
                 ))}
@@ -63,7 +63,7 @@ const countFor = (name?: string) => counts.get(artistKey(name)) ?? 1;
                 <span class="sec__n data">{own.length}</span>
               </div>
 
-              <div class="wall deck" data-stage="view">
+              <div class="wall deck">
                 {own.map((entry) => (
                   <ArtPiece entry={entry} artistCount={countFor(entry.data.artist)} />
                 ))}

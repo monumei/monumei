@@ -11,7 +11,7 @@ const Heading = headingLevel;
 ---
 
 <div class="plate">
-  <div class="plate__row rise">
+  <div class="plate__row">
     <Heading class="plate__title" id={id}>{title}</Heading>
     {meta && <span class="plate__meta data">{meta}</span>}
   </div>
@@ -49,8 +49,81 @@ const Heading = headingLevel;
   }
 
   .plate__channel::before {
-    transition: none;
-    transform: scaleX(clamp(0, calc((var(--p) - 0.04) * 3.2), 1));
+    transform: scaleX(1);
+    transition: transform 900ms var(--ease-seat) 380ms;
+  }
+
+  :global(.js) .plate:not([data-in]) .plate__channel::before {
+    transform: scaleX(0);
+  }
+
+  /* Endfield's title entrance: a solid signal block sweeps across, and the
+     heading is printed underneath it as the block passes the midpoint. */
+  .plate__title {
+    position: relative;
+  }
+
+  .plate__title::after {
+    content: '';
+    position: absolute;
+    inset: 0.08em -0.12em;
+    background: var(--sig);
+    transform: scaleX(0);
+    pointer-events: none;
+  }
+
+  :global(.js) .plate:not([data-in]) .plate__title,
+  :global(.js) .plate:not([data-in]) .plate__meta {
+    color: transparent;
+  }
+
+  :global(.js) .plate[data-in] .plate__title {
+    animation: plate-print 1ms linear 300ms backwards;
+  }
+
+  :global(.js) .plate[data-in] .plate__title::after {
+    animation: plate-block 620ms var(--ease-snap);
+  }
+
+  :global(.js) .plate[data-in] .plate__meta {
+    animation: plate-print 1ms linear 560ms backwards;
+  }
+
+  @keyframes plate-block {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    48% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    52% {
+      transform: scaleX(1);
+      transform-origin: right;
+    }
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
+  }
+
+  @keyframes plate-print {
+    from {
+      color: transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plate__channel::before {
+      transition: none;
+    }
+
+    :global(.js) .plate[data-in] .plate__title,
+    :global(.js) .plate[data-in] .plate__title::after,
+    :global(.js) .plate[data-in] .plate__meta {
+      animation: none;
+    }
   }
 
 </style>

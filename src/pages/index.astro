@@ -63,7 +63,7 @@ const termArt = art.map((a) => ({
   <Hero />
   <Systems />
 
-  <Act id="log" labelledby="log-title" budget={70} loc="LOG">
+  <Act id="log" labelledby="log-title" loc="LOG">
     <ModulePlate
       title="Blog"
       meta={posts.length ? `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}` : undefined}
@@ -104,7 +104,7 @@ const termArt = art.map((a) => ({
     }
   </Act>
 
-  <Act id="rack" labelledby="rack-title" budget={70} loc="WORK">
+  <Act id="rack" labelledby="rack-title" loc="WORK">
     <ModulePlate
       title="Selected Work"
       meta={units.length ? `${units.length} ${units.length === 1 ? 'project' : 'projects'}` : undefined}
@@ -149,7 +149,7 @@ const termArt = art.map((a) => ({
 
   {art.length > 0 && <ArtRail pieces={art} counts={artCounts} />}
 
-  <Act id="channels" labelledby="channels-title" budget={50} loc="CONTACT">
+  <Act id="channels" labelledby="channels-title" loc="CONTACT">
     <ModulePlate title="Channels" id="channels-title" />
     <Channels />
     <NowPlaying />

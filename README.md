@@ -45,7 +45,7 @@ Blog posts can set `socialImage` to a public 1200 × 630 PNG. Other pages use th
 
 `public/brand-mark.svg` is the balanced, detailed OC horn mark.
 `public/brand-wordmark.svg` contains the custom name lettering.
-`public/favicon.svg` is the compact version used wherever the mark is 64px or smaller: navigation, footer, browser tab, and card headers.
+`public/favicon.svg` is the full brand-mark on a square canvas, used wherever the mark is 64px or smaller: navigation, footer, browser tab, and card headers.
 Use the shared SVGs rather than recreating the name with a font or redrawing the horns.
 Sharing-card templates live in `src/assets/social-*.svg`; their public PNG exports
 embed the brand assets and outline the Saira and JetBrains Mono captions.

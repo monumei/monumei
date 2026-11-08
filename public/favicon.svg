@@ -1,11 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="16 -60 448 448">
   <title>Monumei</title>
   <defs>
-    <path id="horn" d="M22 10C16 2 6 3 3 11C0 20 5 29 11 31C16 33 20 29 18 25C12 26 9 20 10 15C11 10 16 10 20 14Z"/>
-    <clipPath id="bands"><use href="#horn"/></clipPath>
-    <g id="banded-horn"><use href="#horn" fill="#8cbaff"/><g clip-path="url(#bands)" fill="#e8bf4b"><path d="M1 14L11 18L10 21L0 17ZM4 24L17 27L18 30L5 27Z"/></g></g>
+    <path id="horn" d="M213 77C178 24 107 14 65 48C12 90 22 184 65 249C87 282 121 300 146 284C170 268 168 237 146 221C122 204 103 190 97 165C84 117 101 84 129 77C157 69 180 82 197 105Z"/>
+    <clipPath id="horn-clip"><use href="#horn"/></clipPath>
+    <mask id="joints"><rect width="240" height="320" fill="white"/><path d="M17 109L100 132L98 137L16 114ZM34 173L124 197L126 203L35 179ZM77 244L158 258L158 263L81 250Z" fill="black"/></mask>
+    <g id="banded-horn" mask="url(#joints)">
+      <use href="#horn" fill="#243954"/>
+      <path d="M213 77C178 24 107 14 65 48C29 77 21 125 30 167L48 178C37 130 43 91 76 68C111 43 160 53 197 105Z" fill="#375373"/>
+      <path d="M31 171C41 212 68 259 101 275C117 282 133 279 143 267C150 254 144 240 134 233C153 242 161 257 150 271C125 310 72 271 52 238C39 216 31 195 27 176Z" fill="#102139"/>
+      <path d="M213 77C178 24 107 14 65 48C45 64 32 86 29 109" fill="none" stroke="#90abc8" stroke-width="2"/>
+      <path d="M129 77C100 84 83 117 97 165C103 190 122 204 146 221" fill="none" stroke="#5082b7" stroke-width="2"/>
+      <g clip-path="url(#horn-clip)">
+        <path d="M17 84Q61 109 108 110L105 131Q56 124 18 105Z" fill="#e8bf4b"/>
+        <path d="M17 84Q61 109 108 110L107 114Q61 113 17 88Z" fill="#ffdb6d"/>
+        <path d="M23 145Q68 170 117 173L128 193Q76 189 30 164Z" fill="#d4a83f"/>
+        <path d="M23 145Q68 170 117 173L120 177Q67 174 24 149Z" fill="#f3ce69"/>
+        <path d="M49 207Q98 234 146 231L155 250Q112 259 65 231Z" fill="#d4a83f"/>
+        <path d="M55 215Q98 238 149 236L151 240Q111 245 59 220Z" fill="#e9bd55"/>
+        <path d="M56 60C30 97 39 157 65 194M76 47C45 92 56 148 83 199" fill="none" stroke="#142941" stroke-width="1.2"/>
+      </g>
+      <path d="M190 47L212 77L198 104L180 78Z" fill="#d8e5ef"/>
+    </g>
+    <g id="half-bridge">
+      <path d="M151 166L185 133L240 208V227L183 157L159 180L140 297H130Z" fill="#d8e5ef"/>
+      <path d="M176 190L195 214L191 239L170 211Z" fill="#0b1422"/>
+      <path d="M136 280H170L168 297H130Z" fill="#315b8d"/>
+    </g>
   </defs>
   <use href="#banded-horn"/>
-  <use href="#banded-horn" transform="translate(48) scale(-1 1)"/>
-  <path d="M12 39L15 20L19 17L24 25L29 17L33 20L36 39H30L28 28L24 34L20 28L18 39Z" fill="#e3e9ee"/>
+  <use href="#banded-horn" transform="translate(480) scale(-1 1)"/>
+  <path d="M130 297L151 166L185 133L240 208L295 133L329 166L350 297H312L300 216L240 291L180 216L168 297Z" fill="#a8bed3"/>
+  <use href="#half-bridge"/>
+  <use href="#half-bridge" transform="translate(480) scale(-1 1)"/>
 </svg>

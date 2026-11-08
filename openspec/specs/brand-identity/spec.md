@@ -7,7 +7,7 @@ TBD - created by archiving change apply-oc-brand-identity. Update Purpose after 
 
 ### Requirement: Balanced OC-derived brand assets
 
-The site SHALL use an original horn mark and custom Monumei wordmark derived from the human OC, with mirrored horn geometry and band placement, restrained navy and gold coloring, and a compact favicon treatment.
+The site SHALL use an original horn mark and custom Monumei wordmark derived from the human OC, with mirrored horn geometry and band placement, restrained navy and gold coloring, and a favicon that reuses the full mark on a square canvas.
 
 #### Scenario: The final mark is rendered
 
@@ -17,7 +17,7 @@ The site SHALL use an original horn mark and custom Monumei wordmark derived fro
 #### Scenario: The mark is reduced
 
 - **WHEN** a favicon is displayed at 16, 32, or 64 pixels
-- **THEN** the compact horn-and-monogram silhouette remains recognizable without the master's fine panel details
+- **THEN** the favicon shows the same horn mark as the master, recognizable at 32px and above
 
 ### Requirement: Consistent website identity
 

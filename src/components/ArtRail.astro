@@ -5,10 +5,9 @@ import { artistPayload, type ArtEntry } from '../lib/art';
 interface Props {
   pieces: ArtEntry[];
   counts: Map<string, number>;
-  pace?: number;
 }
 
-const { pieces, counts, pace = 0.9 } = Astro.props;
+const { pieces, counts } = Astro.props;
 
 const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()) ?? 1;
 ---
@@ -16,10 +15,8 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 <section
   class="arail"
   id="art"
-  data-stage="pin"
   data-loc="ART"
   aria-labelledby="arail-h"
-  data-pace={pace}
 >
   <div class="arail__frame">
     <div class="arail__head">
@@ -33,7 +30,7 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
       </a>
     </div>
 
-    <div class="arail__viewport" data-track data-art-viewport tabindex="0" aria-label="Art preview">
+    <div class="arail__viewport" data-art-viewport tabindex="0" aria-label="Art preview">
       <ul class="arail__track">
         {
           pieces.map((entry, index) => {
@@ -98,38 +95,17 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 
 <style>
   .arail {
-    --p: 0;
     --pad: max(var(--gutter), calc((100vw - var(--rail)) / 2));
     --cell-h: clamp(260px, 50vh, 460px);
     position: relative;
-    height: calc(100svh + var(--budget, 0px));
     background: var(--chassis-0);
   }
 
-  .arail[data-static] {
-    height: auto;
-  }
-
-  .arail[data-static] .arail__frame {
-    position: static;
-    height: auto;
-    padding-block: var(--s8);
-    overflow: visible;
-  }
-
-  .arail[data-static] .arail__track {
-    transform: none;
-  }
-
   .arail__frame {
-    position: sticky;
-    top: 0;
-    height: 100svh;
+    padding-block: clamp(68px, 10svh, var(--s9));
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: clamp(24px, 4vh, 44px);
-    overflow: hidden;
   }
 
   .arail__head {
@@ -159,7 +135,16 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
   }
 
   .arail__viewport {
-    overflow: hidden;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--pad);
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-block-end: var(--s2);
+  }
+
+  .arail__viewport::-webkit-scrollbar {
+    display: none;
   }
 
   .arail__track {
@@ -171,14 +156,13 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
     padding-inline: var(--pad);
     margin: 0;
     list-style: none;
-    transform: translate3d(calc(var(--p) * var(--travel, 0px) * -1), 0, 0);
-    will-change: transform;
   }
 
   .cell {
     display: flex;
     flex-direction: column;
     flex: none;
+    scroll-snap-align: start;
   }
 
   .cell__link {
@@ -291,127 +275,43 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
   }
 
   .arail__progress {
-    display: none;
+    display: flex;
+    justify-content: center;
+    padding-inline: var(--pad);
   }
 
-  @media (max-width: 860px), (max-height: 640px) {
+  .arail__dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 20px;
+  }
+
+  .arail__dot {
+    width: 5px;
+    height: 5px;
+    background: var(--chassis-4);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    transition:
+      width var(--t-fast) var(--ease-snap),
+      background var(--t-fast) var(--ease-snap),
+      box-shadow var(--t-fast) var(--ease-snap);
+  }
+
+  .arail__dot[data-active] {
+    width: 18px;
+    background: var(--led);
+    box-shadow: var(--emit-led);
+    clip-path: none;
+  }
+
+  @media (max-width: 860px) {
     .arail {
       --cell-h: clamp(240px, 58svh, 420px);
-      height: auto;
-    }
-
-    .arail__frame {
-      position: static;
-      height: auto;
-      padding-block: clamp(68px, 10svh, var(--s8));
-      overflow: visible;
-    }
-
-    .arail__viewport {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: var(--pad);
-      overscroll-behavior-x: contain;
-      scrollbar-width: none;
-      touch-action: pan-x pan-y;
-      padding-block-end: var(--s2);
-    }
-
-    .arail__viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .arail__track {
-      transform: none;
-      will-change: auto;
-    }
-
-    .cell {
-      scroll-snap-align: start;
-      scroll-snap-stop: normal;
-    }
-
-    .arail__progress {
-      display: flex;
-      justify-content: center;
-      padding-inline: var(--pad);
-    }
-
-    .arail__dots {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 20px;
-    }
-
-    .arail__dot {
-      width: 5px;
-      height: 5px;
-      background: var(--chassis-4);
-      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-      transition:
-        width var(--t-fast) var(--ease-snap),
-        background var(--t-fast) var(--ease-snap),
-        box-shadow var(--t-fast) var(--ease-snap);
-    }
-
-    .arail__dot[data-active] {
-      width: 18px;
-      background: var(--led);
-      box-shadow: var(--emit-led);
-      clip-path: none;
-    }
-  }
-
-  @media (max-height: 620px) {
-    .arail {
-      height: auto;
-    }
-
-    .arail__frame {
-      position: static;
-      height: auto;
-      padding-block: var(--s8);
-      overflow: visible;
-    }
-
-    .arail__viewport {
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      overscroll-behavior-x: contain;
-    }
-
-    .arail__track {
-      transform: none;
-    }
-
-    .cell {
-      scroll-snap-align: start;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .arail {
-      height: auto;
-    }
-
-    .arail__frame {
-      position: static;
-      height: auto;
-      padding-block: var(--s8);
-      overflow: visible;
-    }
-
-    .arail__viewport {
-      overflow-x: auto;
-      scrollbar-width: none;
-      scroll-snap-type: x mandatory;
-    }
-
-    .arail__track {
-      transform: none;
-    }
-
     .cell__link:hover :global(img),
     .cell__link:focus-visible :global(img) {
       transform: none;
@@ -425,47 +325,6 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
 
 <script>
   const init = () => {
-    const rails = [...document.querySelectorAll<HTMLElement>('.arail')];
-    if (!rails.length) return;
-
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const fallback = window.matchMedia('(max-width: 860px), (max-height: 640px)');
-
-    const measure = () => {
-      const pinned = !reduce.matches && !fallback.matches;
-
-      for (const rail of rails) {
-        const viewport = rail.querySelector<HTMLElement>('.arail__viewport');
-        if (!viewport) continue;
-
-        const travel = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-
-        if (!pinned || travel < 8) {
-          rail.dataset.static = '';
-          rail.style.removeProperty('--budget');
-          continue;
-        }
-
-        delete rail.dataset.static;
-        const pace = Number(rail.dataset.pace) || 0.9;
-        rail.style.setProperty('--budget', `${Math.round(travel * pace)}px`);
-      }
-    };
-
-    measure();
-
-    if (!rails[0].dataset.bound) {
-      rails[0].dataset.bound = '1';
-      addEventListener('resize', measure, { passive: true });
-      reduce.addEventListener('change', measure);
-      fallback.addEventListener('change', measure);
-    }
-
-    if (document.fonts?.ready) document.fonts.ready.then(measure);
-    for (const img of document.querySelectorAll('.arail img')) {
-      if (!(img as HTMLImageElement).complete) img.addEventListener('load', measure, { once: true });
-    }
-
     for (const viewport of document.querySelectorAll<HTMLElement>('[data-art-viewport]')) {
       if (viewport.dataset.artReady === '') continue;
       viewport.dataset.artReady = '';
@@ -509,24 +368,3 @@ const countFor = (name?: string) => counts.get((name ?? '').trim().toLowerCase()
   init();
   document.addEventListener('astro:page-load', init);
 </script>
-
-<style is:global>
-  html:not(.js) .arail {
-    height: auto;
-  }
-
-  html:not(.js) .arail__frame {
-    position: static;
-    height: auto;
-    padding-block: var(--s8);
-    overflow: visible;
-  }
-
-  html:not(.js) .arail__viewport {
-    overflow-x: auto;
-  }
-
-  html:not(.js) .arail__track {
-    transform: none;
-  }
-</style>

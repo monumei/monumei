@@ -31,7 +31,7 @@
     <path d="M194 52V76" stroke="#3a3f47"/>
     <image href="/favicon.svg" x="212" y="48" width="30" height="30"/>
     <image href="/brand-wordmark.svg" x="258" y="56" width="108" height="16"/>
-    <text x="736" y="70" fill="#646c78" font-size="13" text-anchor="end" class="data">FIELD NOTE / 01</text>
+    <text x="736" y="70" fill="#646c78" font-size="13" text-anchor="end" class="data">THE LOG</text>
     <path d="M24 100H760" stroke="#2a2e34"/>
 
     <text x="64" y="180" fill="#b9bfc8" font-size="34" font-weight="450">Breaking the stigma of</text>
@@ -50,9 +50,6 @@
       <path d="M914 230L858 278L914 326"/><path d="M1022 230L1078 278L1022 326"/>
     </g>
     <path d="M994 210L942 346" stroke="#ffd429" stroke-width="14" stroke-linecap="square"/>
-    <path d="M838 408H1098" stroke="#2a2e34"/>
-    <text x="838" y="438" fill="#646c78" font-size="12" class="data">CH / ENG</text>
-    <text x="1098" y="438" fill="#646c78" font-size="12" text-anchor="end" class="data">HUMAN-IN-LOOP</text>
     <path d="M1096 72H1128M1104 80H1128M1112 88H1128" stroke="#3a3f47"/>
 
     <path d="M24 537H1176V606H24Z" fill="#0c0e11"/>

@@ -59,15 +59,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
 
     <div class="word l-word" aria-hidden="true">
       <img class="word__text" src="/brand-wordmark.svg" width="676" height="100" alt="" fetchpriority="high" />
-      <p class="word__plate">
-        <span class="word__tag stencil">MNM-01</span>
-        <span class="word__line data">Field unit <span class="word__dia">◆</span> code · rhythm · art</span>
-      </p>
-    </div>
-
-    <div class="hud brackets l-word" aria-hidden="true">
-      <span class="hud__rail data">monumei.com <span class="word__dia">◆</span> sector 01 <span class="word__dia">◆</span> rain</span>
-      <span class="hud__ticks"></span>
     </div>
 
     <div class="hero__scrim l-scrim" aria-hidden="true"></div>
@@ -192,7 +183,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: clamp(14px, 2.2vw, 28px);
     padding-inline-start: var(--gutter);
     padding-block-end: 22vh;
   }
@@ -202,73 +192,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
     width: min(72vw, 64rem);
     max-width: calc(100vw - var(--gutter) - var(--gutter));
     height: auto;
-  }
-
-  .word__plate {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
-    margin: 0;
-    max-width: calc(100vw - var(--gutter) - var(--gutter));
-  }
-
-  .word__tag {
-    display: grid;
-    place-items: center;
-    padding: 5px 14px 5px 10px;
-    background: var(--sig);
-    color: var(--void);
-    clip-path: polygon(0 0, 100% 0, calc(100% - var(--notch-s)) 100%, 0 100%);
-  }
-
-  .word__line {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-inline-start: 12px;
-    border-inline-start: 1px solid var(--seam-bright);
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-2);
-    white-space: nowrap;
-  }
-
-  .word__dia {
-    font-size: 0.55em;
-    color: var(--sig);
-  }
-
-  /* Hairline signage frame: the Endfield two-corner bracket, a mono rail on
-     the left edge, and a tick ruler along the bottom. Sits behind the figure. */
-  .hud {
-    position: absolute;
-    inset: calc(var(--gutter) + 52px) var(--gutter) var(--gutter);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .hud__rail {
-    position: absolute;
-    left: -6px;
-    bottom: 64px;
-    transform: rotate(-90deg);
-    transform-origin: left top;
-    font-size: 0.625rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--ink-4);
-    white-space: nowrap;
-  }
-
-  .hud__ticks {
-    position: absolute;
-    left: 40px;
-    bottom: 0;
-    width: min(320px, 40%);
-    height: 8px;
-    background: repeating-linear-gradient(90deg, var(--seam-bright) 0 1px, transparent 1px 12px);
-    border-bottom: 1px solid var(--seam-strong);
   }
 
   .figure {
@@ -526,15 +449,6 @@ const bokeh = Array.from({ length: 46 }, () => ({
 
     .word__text {
       width: calc(100vw - var(--gutter) - var(--gutter));
-    }
-
-    .word__line {
-      font-size: 0.625rem;
-      letter-spacing: 0.1em;
-    }
-
-    .hud__rail {
-      display: none;
     }
 
     .l-sky,

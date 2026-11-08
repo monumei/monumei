@@ -24,7 +24,7 @@ const units = (await getCollection('work', ({ data }) => !data.draft)).sort(
 
     {
       units.length ? (
-        <div class="deck page__grid" data-stage="view">
+        <div class="deck page__grid">
           {units.map((u) => (
             <WorkUnit
               href={`/work/${u.id}/`}

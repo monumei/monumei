@@ -27,10 +27,9 @@
     <rect x="24" y="24" width="1152" height="582" fill="url(#grid)"/>
 
     <path d="M64 52H174L164 76H64Z" fill="#ffd429"/>
-    <text x="76" y="70" fill="#08090b" font-size="15" font-weight="700" letter-spacing="3">MNM-01</text>
+    <text x="76" y="70" fill="#08090b" font-size="15" font-weight="700" letter-spacing="3">PROFILE</text>
     <path d="M188 52V76" stroke="#3a3f47"/>
-    <text x="204" y="70" fill="#8a929d" font-size="13" class="data">FIELD UNIT ◆ @M0NUMEI</text>
-    <text x="736" y="70" fill="#646c78" font-size="13" text-anchor="end" class="data">SECTOR 01 / SITE</text>
+    <text x="204" y="70" fill="#8a929d" font-size="13" class="data">@M0NUMEI</text>
     <path d="M24 100H760" stroke="#2a2e34"/>
 
     <text x="64" y="196" fill="#b9bfc8" font-size="34" font-weight="450">Founding engineer</text>
@@ -48,9 +47,6 @@
     <circle cx="968" cy="290" r="210" fill="url(#glow)"/>
     <path d="M808 72H838M808 72V102M1128 490H1098M1128 490V460" fill="none" stroke="#ffd429" stroke-width="2"/>
     <image href="/brand-mark.svg" x="838" y="190" width="260" height="176"/>
-    <path d="M838 408H1098" stroke="#2a2e34"/>
-    <text x="838" y="438" fill="#646c78" font-size="12" class="data">MARK / HORN-BAND</text>
-    <text x="1098" y="438" fill="#646c78" font-size="12" text-anchor="end" class="data">OC-01</text>
     <path d="M1096 72H1128M1104 80H1128M1112 88H1128" stroke="#3a3f47"/>
 
     <path d="M24 537H1176V606H24Z" fill="#0c0e11"/>

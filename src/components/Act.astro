@@ -2,75 +2,25 @@
 interface Props {
   id?: string;
   labelledby?: string;
-  budget?: number;
   loc?: string;
   class?: string;
 }
 
-const { id, labelledby, budget = 80, loc, class: cls } = Astro.props;
+const { id, labelledby, loc, class: cls } = Astro.props;
 ---
 
-<section
-  class:list={['act', cls]}
-  id={id}
-  data-stage="pin"
-  data-loc={loc}
-  aria-labelledby={labelledby}
-  style={`--budget:${budget}vh`}
->
-  <div class="act__frame">
-    <div class="act__inner rail">
-      <slot />
-    </div>
+<section class:list={['act', cls]} id={id} data-loc={loc} aria-labelledby={labelledby}>
+  <div class="act__inner rail">
+    <slot />
   </div>
 </section>
 
 <style>
   .act {
-    --p: 0;
     position: relative;
-    height: calc(100svh + var(--budget, 80vh));
-  }
-
-  .act__frame {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
   }
 
   .act__inner {
-    width: 100%;
-    padding-block: 72px var(--s6);
-  }
-
-  @media (max-width: 860px), (max-height: 700px) {
-    .act {
-      height: calc(100svh + min(var(--budget, 80vh), 46vh));
-    }
-
-    .act__frame {
-      position: sticky;
-      height: 100svh;
-      overflow: hidden;
-    }
-
-    .act__inner {
-      padding-block: clamp(72px, 12svh, 104px) clamp(48px, 9svh, 76px);
-    }
-  }
-
-  @media (max-height: 620px) {
-    .act {
-      height: auto;
-    }
-
-    .act__frame {
-      position: static;
-      height: auto;
-      overflow: visible;
-    }
+    padding-block: clamp(96px, 16svh, 168px) clamp(64px, 10svh, 112px);
   }
 </style>

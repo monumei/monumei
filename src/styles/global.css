@@ -607,44 +607,42 @@ main > :is(.sys, .act, .arail) {
 }
 
 /* ═══ STAGES ═════════════════════════════════════════════════════════════
-   Every section publishes `--p` (0 → 1 across its transit of the viewport).
-   Children derive their own ramp `--r` from it, offset so the section's
-   parts arrive in sequence instead of as one slab. All of it is scrubbed:
-   scroll back up and the motion runs backwards, because it is a function of
-   position rather than an event that already fired.
+   Pinned stages (hero, Systems) publish `--p` and scrub against scroll.
+   Everything else plays once on entry, the way the Endfield site does it:
+   ScrollEngine sets `data-in` when an element reaches the viewport and the
+   keyframes below run from there. Hidden states are gated on `.js`, so
+   without the script the page is an ordinary finished document.
    ════════════════════════════════════════════════════════════════════════ */
 
 [data-stage] {
   --p: 0;
 }
 
-/* Content leads; the heading plate follows a beat behind it. */
-.rise {
-  --r: clamp(0, calc((var(--p) - 0.06) * 3.6), 1);
-  opacity: var(--r);
-  transform: translate3d(0, calc((1 - var(--r)) * 46px), 0);
+/* `backwards`, not `both`: once the entrance ends the element hands its
+   transform back, so card hover motion keeps working. */
+.js .rise:not([data-in]),
+.js .deck:not([data-in]) > *,
+.js .wipe:not([data-in]),
+.js .power:not([data-in]) {
+  opacity: 0;
 }
 
-.rise--late {
-  --r: clamp(0, calc((var(--p) - 0.16) * 3.4), 1);
+.js .rise[data-in],
+.js .deck[data-in] > * {
+  animation: rise var(--t-slow) var(--ease-seat) backwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
 }
 
-/* A wave: each item is nudged later in the ramp than the one before it. */
-.deck > * {
-  --i: 0;
-  --r: clamp(0, calc((var(--p) - 0.08) * 3 - var(--i) * 0.14), 1);
-  opacity: var(--r);
-  transform: translate3d(0, calc((1 - var(--r)) * 62px), 0);
-}
-
-/* Alternating entry, so a second grid on the same page doesn't repeat the
-   first one's move verbatim. */
-.deck--alt > * {
-  transform: translate3d(calc((1 - var(--r)) * var(--dir, 40px)), calc((1 - var(--r)) * 34px), 0);
+.js .deck--alt[data-in] > * {
+  animation-name: rise-side;
 }
 
 .deck--alt > *:nth-child(even) {
-  --dir: -40px;
+  --dir: -2.5rem;
+}
+
+.rise--late {
+  --i: 3;
 }
 
 .deck > *:nth-child(2) {
@@ -659,64 +657,66 @@ main > :is(.sys, .act, .arail) {
 .deck > *:nth-child(5) {
   --i: 4;
 }
-.deck > *:nth-child(6) {
+.deck > *:nth-child(n + 6) {
   --i: 5;
 }
 
-/* A left-to-right reveal, for content that reads as a printed list. */
-.wipe {
-  --r: clamp(0, calc((var(--p) - 0.12) * 3), 1);
-  clip-path: inset(0 calc((1 - var(--r)) * 101%) 0 0);
-  opacity: calc(0.3 + var(--r) * 0.7);
+.js .wipe[data-in] {
+  animation: wipe var(--t-slow) var(--ease-snap) backwards;
 }
 
-/* Powers on rather than sliding in — for the shell, which is a screen.
-   Opacity and transform only: a scroll-driven brightness() filter meant
-   re-filtering the whole panel on every frame for the same visual result. */
-.power {
-  --r: clamp(0, calc((var(--p) - 0.14) * 3.2), 1);
-  opacity: calc(0.12 + var(--r) * 0.88);
-  transform: scale(calc(0.975 + var(--r) * 0.025));
-  will-change: transform, opacity;
+/* The shell is a screen, so it powers on with a stutter instead of sliding. */
+.js .power[data-in] {
+  animation: flicker 900ms linear backwards;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 2rem, 0);
+  }
+}
+
+@keyframes rise-side {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--dir, 2.5rem), 1rem, 0);
+  }
+}
+
+@keyframes wipe {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  to {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes flicker {
+  0%,
+  10%,
+  20%,
+  40% {
+    opacity: 0;
+  }
+  11%,
+  21%,
+  41% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise,
-  .deck > * {
-    opacity: 1;
-    transform: none;
+  .js .rise[data-in],
+  .js .deck[data-in] > *,
+  .js .wipe[data-in],
+  .js .power[data-in] {
+    animation: none;
   }
-
-  .wipe {
-    clip-path: none;
-    opacity: 1;
-  }
-
-  .power {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-
-/* Without JS nothing sets --p, so every stage sits at its finished state
-   and the page reads as an ordinary static document. The motion is purely
-   additive. */
-html:not(.js) .rise,
-html:not(.js) .deck > * {
-  opacity: 1;
-  transform: none;
-}
-
-html:not(.js) .wipe {
-  clip-path: none;
-  opacity: 1;
-}
-
-html:not(.js) .power {
-  opacity: 1;
-  transform: none;
-  filter: none;
 }
 
 /* ═══ UTILITIES ══════════════════════════════════════════════════════════ */
