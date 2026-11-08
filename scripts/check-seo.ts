@@ -52,19 +52,18 @@ for (const file of files) {
       /<meta property="og:title"/,
       /<meta property="og:description"/,
       /<meta property="og:url"/,
-      /<meta name="twitter:card" content="summary">/,
+      /<meta property="og:image" content="https:\/\/monumei\.com\/[^"]+">/,
+      /<meta name="twitter:card" content="summary_large_image">/,
       /<meta name="twitter:creator" content="@m0numei">/,
       /<meta name="twitter:title"/,
       /<meta name="twitter:description"/,
+      /<meta name="twitter:image" content="https:\/\/monumei\.com\/[^"]+">/,
     ];
     for (const pattern of requiredSocial) {
       if (!has(source, pattern)) fail(page, `missing social metadata ${pattern}`);
     }
   }
 
-  if (has(source, /<meta property="og:image"|<meta name="twitter:image"/)) {
-    fail(page, 'image metadata must wait for approved assets');
-  }
 
   const types = schemaTypes(source, page);
   if (page === '/') {

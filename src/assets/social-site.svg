@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <title>Monumei: founding engineer, software, rhythm games, and art</title>
+  <defs>
+    <style>
+      @font-face { font-family: Saira; src: url('/node_modules/@fontsource-variable/saira/files/saira-latin-wght-normal.woff2'); font-weight: 100 900; }
+      @font-face { font-family: JetBrains; src: url('/node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2'); font-weight: 100 800; }
+      text { font-family: Saira, sans-serif; }
+      .data { font-family: JetBrains, monospace; letter-spacing: 3px; }
+    </style>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity="0.035"/>
+    </pattern>
+    <pattern id="hazard" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="14" fill="#ffd429"/>
+    </pattern>
+    <linearGradient id="bay" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#16181c"/><stop offset="1" stop-color="#0c0e11"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#2e7bff" stop-opacity="0.28"/><stop offset="1" stop-color="#2e7bff" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="frame"><path d="M24 24H1144L1176 56V574L1144 606H56L24 574Z"/></clipPath>
+  </defs>
+  <rect width="1200" height="630" fill="#08090b"/>
+  <g clip-path="url(#frame)">
+    <rect x="24" y="24" width="1152" height="582" fill="#111316"/>
+    <rect x="24" y="24" width="1152" height="582" fill="url(#grid)"/>
+
+    <path d="M64 52H174L164 76H64Z" fill="#ffd429"/>
+    <text x="76" y="70" fill="#08090b" font-size="15" font-weight="700" letter-spacing="3">MNM-01</text>
+    <path d="M188 52V76" stroke="#3a3f47"/>
+    <text x="204" y="70" fill="#8a929d" font-size="13" class="data">FIELD UNIT ◆ @M0NUMEI</text>
+    <text x="736" y="70" fill="#646c78" font-size="13" text-anchor="end" class="data">SECTOR 01 / SITE</text>
+    <path d="M24 100H760" stroke="#2a2e34"/>
+
+    <text x="64" y="196" fill="#b9bfc8" font-size="34" font-weight="450">Founding engineer</text>
+    <image href="/brand-wordmark.svg" x="61" y="232" width="642" height="95"/>
+    <path d="M64 356H196L186 372H64Z" fill="#ffd429"/>
+    <rect x="204" y="356" width="120" height="16" fill="url(#hazard)"/>
+    <text x="64" y="436" fill="#b9bfc8" font-size="28" font-weight="450">Software, rhythm games, and art</text>
+    <g fill="#ffd429"><path d="M64 486l5 5-5 5-5-5z"/><path d="M104 486l5 5-5 5-5-5z" opacity="0.4"/><path d="M144 486l5 5-5 5-5-5z" opacity="0.4"/></g>
+    <path d="M172 491H420" stroke="#2a2e34"/>
+
+    <path d="M760 24H1176V537H760Z" fill="url(#bay)"/>
+    <path d="M760 24V537" stroke="#08090b" stroke-width="6"/>
+    <path d="M762 120V420" stroke="#2e7bff" stroke-width="3"/>
+    <path d="M762 120V170" stroke="#8cbaff" stroke-width="3"/>
+    <circle cx="968" cy="290" r="210" fill="url(#glow)"/>
+    <path d="M808 72H838M808 72V102M1128 490H1098M1128 490V460" fill="none" stroke="#ffd429" stroke-width="2"/>
+    <image href="/brand-mark.svg" x="838" y="190" width="260" height="176"/>
+    <path d="M838 408H1098" stroke="#2a2e34"/>
+    <text x="838" y="438" fill="#646c78" font-size="12" class="data">MARK / HORN-BAND</text>
+    <text x="1098" y="438" fill="#646c78" font-size="12" text-anchor="end" class="data">OC-01</text>
+    <path d="M1096 72H1128M1104 80H1128M1112 88H1128" stroke="#3a3f47"/>
+
+    <path d="M24 537H1176V606H24Z" fill="#0c0e11"/>
+    <path d="M24 537H1176" stroke="#2a2e34"/>
+    <text x="64" y="580" fill="#b9bfc8" font-size="22" font-weight="450">Systems, writing, and things I make</text>
+    <rect x="760" y="562" width="96" height="14" fill="url(#hazard)" opacity="0.5"/>
+    <text x="1110" y="578" fill="#b9bfc8" font-size="16" text-anchor="end" class="data">monumei.com</text>
+  </g>
+  <path d="M24 24H1144L1176 56V574L1144 606H56L24 574Z" fill="none" stroke="#3b3b3b"/>
+  <path d="M24 140V218M1176 410V488" stroke="#8cbaff" stroke-width="3"/>
+  <path d="M24 140V166M1176 462V488" stroke="#f0f2f5" stroke-width="3"/>
+</svg>

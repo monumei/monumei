@@ -12,6 +12,7 @@ interface Props {
   location?: string;
   canonical?: boolean;
   index?: boolean;
+  socialImage?: string;
   openGraphType?: 'website' | 'article';
   article?: {
     publishedTime: string;
@@ -28,10 +29,12 @@ const {
   canonical: hasCanonical = true,
   index = true,
   openGraphType = 'website',
+  socialImage = '/social-site.png',
   article,
   schema = [],
 } = Astro.props;
 const canonical = hasCanonical ? new URL(Astro.url.pathname, Astro.site) : undefined;
+const socialImageUrl = new URL(socialImage, Astro.site);
 ---
 
 <!doctype html>
@@ -57,6 +60,10 @@ const canonical = hasCanonical ? new URL(Astro.url.pathname, Astro.site) : undef
           <meta property="og:title" content={title} />
           <meta property="og:description" content={description} />
           <meta property="og:url" content={canonical} />
+          <meta property="og:image" content={socialImageUrl} />
+          <meta property="og:image:alt" content={title} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
           {article && (
             <>
               <meta property="article:published_time" content={article.publishedTime} />
@@ -64,10 +71,12 @@ const canonical = hasCanonical ? new URL(Astro.url.pathname, Astro.site) : undef
               {article.tags.map((tag) => <meta property="article:tag" content={tag} />)}
             </>
           )}
-          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:creator" content="@m0numei" />
           <meta name="twitter:title" content={title} />
           <meta name="twitter:description" content={description} />
+          <meta name="twitter:image" content={socialImageUrl} />
+          <meta name="twitter:image:alt" content={title} />
         </>
       )
     }

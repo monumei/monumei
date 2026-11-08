@@ -1,0 +1,6 @@
+- [x] Delete `public/social-*-v2.png` and `public/social-*-v3.png`
+- [x] Nav: hide the wordmark when `location` is `ROOT`
+- [x] Hero: add the signage layer and resize the wordmark
+- [x] Rework `src/assets/social-site.svg` and `src/assets/social-vibe-coding.svg`
+- [x] Export both to `public/social-*.png (no version suffix)` and point the default and the post at them
+- [x] Screenshot desktop and mobile, inspect both cards, run `bun run check:seo`

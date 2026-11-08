@@ -22,3 +22,5 @@ node_modules/
 DESIGN.md
 PRODUCT.md
 docs/
+.vercel
+.env*

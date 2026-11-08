@@ -36,3 +36,16 @@
 ## 📊 Stats
 
 [![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=monumei&theme=meta-dark&hide_border=true)](https://git.io/streak-stats)
+
+## Social previews
+
+Blog posts can set `socialImage` to a public 1200 × 630 PNG. Other pages use the default site sharing image.
+
+## Brand assets
+
+`public/brand-mark.svg` is the balanced, detailed OC horn mark.
+`public/brand-wordmark.svg` contains the custom name lettering.
+`public/favicon.svg` is the compact version used wherever the mark is 64px or smaller: navigation, footer, browser tab, and card headers.
+Use the shared SVGs rather than recreating the name with a font or redrawing the horns.
+Sharing-card templates live in `src/assets/social-*.svg`; their public PNG exports
+embed the brand assets and outline the Saira and JetBrains Mono captions.

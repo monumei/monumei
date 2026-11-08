@@ -33,6 +33,7 @@ const schema = blogPostSchema({
   description={post.data.summary}
   location="LOG"
   openGraphType="article"
+  socialImage={post.data.socialImage}
   article={{ publishedTime, section: post.data.channel, tags: post.data.tags }}
   schema={schema}
 >

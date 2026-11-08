@@ -26,6 +26,7 @@ const blog = defineCollection({
         channel: z.enum(CHANNELS).default('ENG'),
         tags: z.array(z.string()).default([]),
         cover: image().optional(),
+        socialImage: z.string().optional(),
         coverAlt: z.string().optional(),
         draft: z.boolean().default(false),
         sample: z.boolean().default(false),

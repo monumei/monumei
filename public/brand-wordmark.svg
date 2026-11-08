@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="676" height="100" viewBox="0 0 676 100">
+  <title>Monumei</title>
+  <defs>
+    <path id="m" d="M0 100V18L18 0H35L54 34L73 0H90L108 18V100H84V34L54 77L24 34V100Z"/>
+    <path id="o" fill-rule="evenodd" d="M21 0H70L90 20V80L69 100H20L0 80V21ZM30 23L23 30V70L30 77H60L67 70V30L60 23Z"/>
+    <path id="n" d="M0 100V0H24L72 63V0H96V100H72L24 37V100Z"/>
+    <path id="u" d="M0 0H24V68L33 77H57L66 68V0H90V80L70 100H20L0 80Z"/>
+    <path id="e" d="M0 100V0H78V23H24V39H65V61H24V77H78V100Z"/>
+    <path id="i" d="M0 0H34V82L16 100H0Z"/>
+    <mask id="joints"><rect width="676" height="100" fill="white"/><path d="M0 65H24V70H0ZM161 0H167V23H161ZM256 38L280 68L284 65L260 35ZM372 77H378V100H372ZM516 31H540V36H516ZM552 47H576V52H552ZM642 23H676V29H642Z" fill="black"/></mask>
+  </defs>
+  <g mask="url(#joints)" fill="#e3e9ee"><use href="#m"/><use href="#o" x="120"/><use href="#n" x="222"/><use href="#u" x="330"/><use href="#m" x="432"/><use href="#e" x="552"/><use href="#i" x="642"/></g>
+  <path d="M576 39H617V61H576Z" fill="#e8bf4b"/>
+  <path d="M8 65H24V70H8ZM161 0H167V17H161Z" fill="#5082b7"/>
+</svg>
